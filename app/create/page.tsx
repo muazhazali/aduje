@@ -242,7 +242,7 @@ export default function CreateReportPage() {
             <span className={`hidden text-xs sm:inline ${i <= step ? "font-medium text-foreground" : "text-muted-foreground"}`}>
               {s}
             </span>
-            {i < STEPS.length - 1 && <div className="h-px w-6 bg-border" />}
+            {i < steps.length - 1 && <div className="h-px w-6 bg-border" />}
           </div>
         ))}
       </div>

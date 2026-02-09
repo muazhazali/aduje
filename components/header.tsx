@@ -5,11 +5,11 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useStore } from "@/lib/store"
 import { BoringAvatar } from "./boring-avatar"
-import { Home, Map, PlusCircle, Bell, Trophy, Shield, Search } from "lucide-react"
+import { Home, Map, PlusCircle, Bell, Trophy, Shield, Search, Languages } from "lucide-react"
 import { Button } from "@govtechmy/myds-react/button"
 import { Input } from "@govtechmy/myds-react/input"
 import { useState } from "react"
-import { useTranslations } from "next-intl"
+import { useTranslations, useLocale } from "next-intl"
 
 import pb from "@/lib/pocketbase"
 
@@ -18,9 +18,16 @@ export function Header() {
   const { user, unreadCount } = useStore()
   const [searchOpen, setSearchOpen] = useState(false)
   const t = useTranslations()
+  const locale = useLocale()
   
   // Check authentication: Either PocketBase is valid OR we have a user in Zustand (demo mode)
   const isAuthenticated = (pb.authStore.isValid || user !== null) && user !== null
+
+  const toggleLanguage = () => {
+    const newLocale = locale === "ms" ? "en" : "ms"
+    document.cookie = `locale=${newLocale}; path=/; max-age=31536000`
+    window.location.reload()
+  }
 
   const desktopNav = [
     { href: "/", icon: Home, label: t("nav.feed") },
@@ -34,9 +41,9 @@ export function Header() {
         {/* Logo */}
         <Link href="/" className="flex shrink-0 items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <span className="text-sm font-bold text-primary-foreground">R</span>
+            <span className="text-sm font-bold text-primary-foreground">A</span>
           </div>
-          <span className="hidden text-base font-bold text-foreground sm:inline">ReporterMY</span>
+          <span className="hidden text-base font-bold text-foreground sm:inline">AduJe</span>
         </Link>
 
         {/* Desktop Nav */}
@@ -87,6 +94,18 @@ export function Header() {
               {t("nav.report")}
             </Button>
           </Link>
+
+          {/* Language Switcher */}
+          <Button
+            variant="default-ghost"
+            size="small"
+            onClick={toggleLanguage}
+            aria-label="Switch language"
+            className="gap-1"
+          >
+            <Languages className="h-4 w-4" />
+            <span className="hidden text-xs font-medium sm:inline">{locale === "ms" ? "EN" : "MS"}</span>
+          </Button>
 
           {/* Notifications */}
           <Link href="/notifications">

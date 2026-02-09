@@ -1,4 +1,4 @@
-# ReporterMY - Pelapor Isu Komuniti
+# AduJe - Pelapor Isu Komuniti
 
 Progressive Web App (PWA) untuk komuniti Malaysia melapor isu setempat seperti lubang jalan, lampu jalan rosak, dan sampah sarap. Aplikasi ini direka bentuk untuk mudah digunakan di telefon, menggunakan reka bentuk MYDS, serta menyokong peta dan penjejakan status.
 
@@ -75,7 +75,6 @@ Progressive Web App (PWA) untuk komuniti Malaysia melapor isu setempat seperti l
 - Penilaian prestasi Lighthouse belum dijalankan.
 
 ## Penambahbaikan Masa Depan
-- Mod dwi-bahasa (BM/EN) dengan pemilih bahasa.
 - Pengesahan laporan lebih pintar (AI/image).
 - Notifikasi push penuh dan emel mingguan.
 - Paparan peta dengan cluster dan radius filter.

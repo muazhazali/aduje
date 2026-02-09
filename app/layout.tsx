@@ -14,12 +14,12 @@ const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
 
 export const metadata: Metadata = {
   title: {
-    default: "ReporterMY - Pelapor Isu Komuniti",
-    template: "%s | ReporterMY",
+    default: "AduJe - Pelapor Isu Komuniti",
+    template: "%s | AduJe",
   },
   description:
     "Laporkan dan jejak isu setempat di komuniti anda. Lubang jalan, lampu jalan, sampah sarap dan banyak lagi.",
-  applicationName: "ReporterMY",
+  applicationName: "AduJe",
   keywords: [
     "lapor isu komuniti",
     "pelapor isu",
@@ -33,17 +33,17 @@ export const metadata: Metadata = {
   ],
   metadataBase: new URL(appUrl),
   openGraph: {
-    title: "ReporterMY - Pelapor Isu Komuniti",
+    title: "AduJe - Pelapor Isu Komuniti",
     description:
       "Laporkan dan jejak isu setempat di komuniti anda. Lubang jalan, lampu jalan, sampah sarap dan banyak lagi.",
     url: appUrl,
-    siteName: "ReporterMY",
+    siteName: "AduJe",
     locale: "ms_MY",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ReporterMY - Pelapor Isu Komuniti",
+    title: "AduJe - Pelapor Isu Komuniti",
     description:
       "Laporkan dan jejak isu setempat di komuniti anda. Lubang jalan, lampu jalan, sampah sarap dan banyak lagi.",
   },
@@ -62,7 +62,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "ReporterMY",
+    title: "AduJe",
   },
 }
 

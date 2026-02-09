@@ -1,7 +1,7 @@
 {
-  "name": "ReporterMY",
-  "short_name": "ReporterMY",
-  "description": "Report and track local issues in your Malaysian community",
+  "name": "AduJe",
+  "short_name": "AduJe",
+  "description": "Laporkan dan jejak isu setempat di komuniti anda",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FAFAFA",
