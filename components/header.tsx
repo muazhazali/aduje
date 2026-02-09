@@ -40,9 +40,7 @@ export function Header() {
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-4 px-4">
         {/* Logo */}
         <Link href="/" className="flex shrink-0 items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <span className="text-sm font-bold text-primary-foreground">A</span>
-          </div>
+          <img src="/aduje-logo.png" alt="AduJe" className="h-8 w-8" />
           <span className="hidden text-base font-bold text-foreground sm:inline">AduJe</span>
         </Link>
 
@@ -104,7 +102,7 @@ export function Header() {
             className="gap-1"
           >
             <Languages className="h-4 w-4" />
-            <span className="hidden text-xs font-medium sm:inline">{locale === "ms" ? "EN" : "MS"}</span>
+            <span className="hidden text-xs font-medium uppercase sm:inline">{locale}</span>
           </Button>
 
           {/* Notifications */}

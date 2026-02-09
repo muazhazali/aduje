@@ -61,7 +61,9 @@ export default function LeaderboardPage() {
                 <Card key={u.id} className={cn("text-center", i === 0 && "order-2", i === 1 && "order-1", i === 2 && "order-3")}>
                   <CardContent className={cn("p-4 rounded-lg border", PODIUM_STYLES[i])}>
                     <RankIcon className={cn("mx-auto h-5 w-5 mb-2", i === 0 ? "text-secondary" : "text-muted-foreground")} />
-                    <BoringAvatar seed={u.avatarSeed} size={i === 0 ? 56 : 44} />
+                    <div className="flex justify-center">
+                      <BoringAvatar seed={u.avatarSeed} size={i === 0 ? 56 : 44} />
+                    </div>
                     <p className="mt-2 text-sm font-semibold text-foreground truncate">{u.name}</p>
                     <p className="text-lg font-bold text-primary">{formatPoints(u.points)}</p>
                     <p className="text-xs text-muted-foreground">{t("common.points")}</p>
