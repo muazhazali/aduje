@@ -1,0 +1,11 @@
+- refer to PRD.md for the requirements
+- for the avatar, use https://github.com/boringdesigners/boring-avatars and generate a random avatar for the user (if possible, if not, then let the user upload photo)
+- env at .env.local, for POCKETBASE_URL, POCKETBASE_SU_EMAIL, POCKETBASE_SU_PASSWORD
+- you can access and write script to create collection and fields in pocketbase using the .env.local
+- use https://design.digital.gov.my/en/docs/develop as the design system (use context7 mcp for search latest docs)
+- update readme.md with the new features and changes (include the tech stack, features, and how to run the project)
+    - add analytics section in readme using this link https://umami.muaz.app/share/seTdPt2PEeX4C1kk
+- make sure the ui and ux is consistent with the design system
+- translate the project to malay (use i18n) and set the default language to malay
+- add SEO meta tags to the project with relevant keywords and descriptions
+- add analytics using umami and the script is "<script defer src="https://umami.muaz.app/script.js" data-website-id="4063230e-bfbd-46c7-abfb-9b84c3944c7a"></script>"
