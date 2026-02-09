@@ -10,7 +10,7 @@ import { useTranslations } from "next-intl"
 import { useEffect, useState } from "react"
 import { fetchNotificationsByUser, fetchUsers, getAuthUser } from "@/lib/pocketbase-data"
 import type { User } from "@/lib/types"
-import pb from "@/lib/pocketbase"
+import { loginWithPassword, loginWithOAuth, DEMO_CREDENTIALS } from "@/lib/auth-utils"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -26,30 +26,64 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     try {
-      await pb.collection("users").authWithOAuth2({ provider: "google" })
-      const authUser = getAuthUser()
-      if (!authUser) {
-        toast.error("Gagal log masuk.")
-        return
-      }
+      const authUser = await loginWithOAuth("google")
       setUser(authUser)
       const notifications = await fetchNotificationsByUser(authUser.id)
       setNotifications(notifications)
       toast.success(t("auth.signedInAs", { name: authUser.name }))
       router.push("/")
     } catch (error) {
+      console.error("Google login error:", error)
       toast.error("Gagal log masuk.")
     }
   }
 
   const handleDemoLogin = async (userIndex: number) => {
-    const user = demoUsers[userIndex]
-    if (!user) return
-    setUser(user)
-    const notifications = await fetchNotificationsByUser(user.id)
-    setNotifications(notifications)
-    toast.success(t("auth.signedInAs", { name: user.name }))
-    router.push("/")
+    const demoUser = demoUsers[userIndex]
+    if (!demoUser) {
+      toast.error("Akaun demo tidak tersedia.")
+      return
+    }
+
+    try {
+      // For demo purposes ONLY: We'll try to authenticate with the demo credentials first
+      // If that fails (users don't exist with passwords), we fall back to client-side only auth
+      const credentials = DEMO_CREDENTIALS[userIndex]
+      
+      if (credentials) {
+        try {
+          // Try proper authentication first
+          const authUser = await loginWithPassword(credentials.email, credentials.password)
+          setUser(authUser)
+          const notifications = await fetchNotificationsByUser(authUser.id)
+          setNotifications(notifications)
+          toast.success(t("auth.signedInAs", { name: authUser.name }))
+          router.push("/")
+          return
+        } catch (authError) {
+          // Authentication failed - demo users don't have passwords set up
+          console.warn("Demo password auth failed, using client-side demo mode:", authError)
+        }
+      }
+      
+      // FALLBACK: Client-side demo mode (NOT FOR PRODUCTION)
+      // This allows testing the UI but won't allow server-side actions
+      console.warn("⚠️  Running in CLIENT-SIDE DEMO MODE - Server actions will fail!")
+      console.warn("To fix: Create demo users with passwords in PocketBase")
+      
+      setUser(demoUser)
+      const notifications = await fetchNotificationsByUser(demoUser.id)
+      setNotifications(notifications)
+      
+      toast.success(t("auth.signedInAs", { name: demoUser.name }), {
+        description: "⚠️ Demo mode - some features limited"
+      })
+      router.push("/")
+      
+    } catch (error) {
+      console.error("Demo login error:", error)
+      toast.error("Gagal log masuk dengan akaun demo. Sila cuba lagi.")
+    }
   }
 
   return (

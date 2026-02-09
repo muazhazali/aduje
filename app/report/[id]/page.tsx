@@ -151,7 +151,13 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
   }
 
   const handleComment = async () => {
-    if (!commentText.trim() || !user) return
+    if (!user) {
+      toast.error(t("auth.pleaseSignIn"))
+      router.push("/login")
+      return
+    }
+    if (!commentText.trim()) return
+    
     try {
       const created = await pb.collection("comments").create({
         reportId: report.id,
@@ -171,6 +177,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
       toast.success(t("report.commentPosted"))
       setCommentText("")
     } catch (error) {
+      console.error("Comment creation error:", error)
       toast.error("Gagal. Sila cuba lagi.")
     }
   }
@@ -290,18 +297,29 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
 
           {/* Comment input */}
           {!report.commentsLocked ? (
-            <div className="mb-4 flex gap-2">
-              <Textarea
-                placeholder={t("report.commentPlaceholder")}
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                className="min-h-[60px] text-sm"
-                maxLength={500}
-              />
-              <Button size="icon" onClick={handleComment} disabled={!commentText.trim()}>
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
+            user ? (
+              <div className="mb-4 flex gap-2">
+                <Textarea
+                  placeholder={t("report.commentPlaceholder")}
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  className="min-h-[60px] text-sm"
+                  maxLength={500}
+                />
+                <Button size="icon" onClick={handleComment} disabled={!commentText.trim()}>
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="mb-4 rounded-md bg-muted p-4 text-center">
+                <p className="text-sm text-muted-foreground mb-2">
+                  {t("auth.pleaseSignIn")} untuk komen
+                </p>
+                <Button size="sm" onClick={() => router.push("/login")} className="gap-1.5">
+                  {t("actions.signIn")}
+                </Button>
+              </div>
+            )
           ) : (
             <p className="mb-4 rounded-md bg-muted p-3 text-center text-xs text-muted-foreground">
               {t("report.commentsLocked")}

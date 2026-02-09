@@ -9,23 +9,22 @@ import { useEffect } from "react"
 import { fetchNotificationsByUser, getAuthUser } from "@/lib/pocketbase-data"
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const { setUser, setNotifications, isAuthenticated } = useStore()
+  const { setUser, setNotifications } = useStore()
 
   useEffect(() => {
+    // Initialize authentication from PocketBase authStore on mount
     const authUser = getAuthUser()
     if (authUser) {
       setUser(authUser)
       fetchNotificationsByUser(authUser.id)
         .then(setNotifications)
         .catch(() => setNotifications([]))
-      return
-    }
-
-    if (isAuthenticated) {
+    } else {
+      // Clear store if no valid auth
       setUser(null)
       setNotifications([])
     }
-  }, [isAuthenticated, setUser, setNotifications])
+  }, [setUser, setNotifications])
 
   return (
     <div className="min-h-screen bg-background">

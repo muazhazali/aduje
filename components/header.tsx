@@ -11,11 +11,16 @@ import { Input } from "@govtechmy/myds-react/input"
 import { useState } from "react"
 import { useTranslations } from "next-intl"
 
+import pb from "@/lib/pocketbase"
+
 export function Header() {
   const pathname = usePathname()
-  const { user, isAuthenticated, unreadCount } = useStore()
+  const { user, unreadCount } = useStore()
   const [searchOpen, setSearchOpen] = useState(false)
   const t = useTranslations()
+  
+  // Check authentication: Either PocketBase is valid OR we have a user in Zustand (demo mode)
+  const isAuthenticated = (pb.authStore.isValid || user !== null) && user !== null
 
   const desktopNav = [
     { href: "/", icon: Home, label: t("nav.feed") },
