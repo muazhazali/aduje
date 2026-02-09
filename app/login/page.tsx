@@ -2,31 +2,53 @@
 
 import { useRouter } from "next/navigation"
 import { useStore } from "@/lib/store"
-import { MOCK_USERS, MOCK_NOTIFICATIONS } from "@/lib/mock-data"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { BoringAvatar } from "@/components/boring-avatar"
 import { toast } from "sonner"
 import { useTranslations } from "next-intl"
+import { useEffect, useState } from "react"
+import { fetchNotificationsByUser, fetchUsers, getAuthUser } from "@/lib/pocketbase-data"
+import type { User } from "@/lib/types"
+import pb from "@/lib/pocketbase"
 
 export default function LoginPage() {
   const router = useRouter()
   const { setUser, setNotifications } = useStore()
   const t = useTranslations()
+  const [demoUsers, setDemoUsers] = useState<User[]>([])
 
-  const handleGoogleLogin = () => {
-    // In production, this would use PocketBase OAuth
-    // For demo, we'll simulate login
-    setUser(MOCK_USERS[0])
-    setNotifications(MOCK_NOTIFICATIONS)
-    toast.success(t("auth.signedInAs", { name: "Ahmad bin Ibrahim" }))
-    router.push("/")
+  useEffect(() => {
+    fetchUsers()
+      .then((users) => setDemoUsers(users.filter((u) => !u.isAdmin).slice(0, 4)))
+      .catch(() => setDemoUsers([]))
+  }, [])
+
+  const handleGoogleLogin = async () => {
+    try {
+      await pb.collection("users").authWithOAuth2({ provider: "google" })
+      const authUser = getAuthUser()
+      if (!authUser) {
+        toast.error("Gagal log masuk.")
+        return
+      }
+      setUser(authUser)
+      const notifications = await fetchNotificationsByUser(authUser.id)
+      setNotifications(notifications)
+      toast.success(t("auth.signedInAs", { name: authUser.name }))
+      router.push("/")
+    } catch (error) {
+      toast.error("Gagal log masuk.")
+    }
   }
 
-  const handleDemoLogin = (userIndex: number) => {
-    setUser(MOCK_USERS[userIndex])
-    setNotifications(MOCK_NOTIFICATIONS)
-    toast.success(t("auth.signedInAs", { name: MOCK_USERS[userIndex].name }))
+  const handleDemoLogin = async (userIndex: number) => {
+    const user = demoUsers[userIndex]
+    if (!user) return
+    setUser(user)
+    const notifications = await fetchNotificationsByUser(user.id)
+    setNotifications(notifications)
+    toast.success(t("auth.signedInAs", { name: user.name }))
     router.push("/")
   }
 
@@ -73,7 +95,7 @@ export default function LoginPage() {
           </div>
 
           <div className="flex flex-col gap-2">
-            {MOCK_USERS.slice(0, 4).map((u, i) => (
+            {demoUsers.map((u, i) => (
               <Button
                 key={u.id}
                 variant="outline"

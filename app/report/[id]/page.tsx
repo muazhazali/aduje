@@ -1,8 +1,7 @@
 "use client"
 
-import { use, useState } from "react"
+import { use, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { MOCK_REPORTS, MOCK_COMMENTS } from "@/lib/mock-data"
 import { useStore } from "@/lib/store"
 import { StatusBadge } from "@/components/status-badge"
 import { CategoryBadge } from "@/components/category-badge"
@@ -30,21 +29,64 @@ import {
 import { toast } from "sonner"
 import { ReportMap } from "@/components/report-map"
 import { useTranslations } from "next-intl"
+import { fetchCommentsByReport, fetchReportById, mapComment } from "@/lib/pocketbase-data"
+import type { Comment, Report } from "@/lib/types"
+import pb from "@/lib/pocketbase"
 
 export default function ReportDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const router = useRouter()
   const { user } = useStore()
   const t = useTranslations()
-  const report = MOCK_REPORTS.find((r) => r.id === id)
-  const comments = MOCK_COMMENTS.filter((c) => c.reportId === id && !c.parentId)
-  const allComments = MOCK_COMMENTS.filter((c) => c.reportId === id)
+  const [report, setReport] = useState<Report | null>(null)
+  const [comments, setComments] = useState<Comment[]>([])
+  const [allComments, setAllComments] = useState<Comment[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const [isFollowing, setIsFollowing] = useState(() => report?.followers.includes(user?.id || "") ?? false)
-  const [hasUpvoted, setHasUpvoted] = useState(() => report?.upvotes.includes(user?.id || "") ?? false)
-  const [upvoteCount, setUpvoteCount] = useState(report?.upvoteCount ?? 0)
+  const [isFollowing, setIsFollowing] = useState(false)
+  const [hasUpvoted, setHasUpvoted] = useState(false)
+  const [upvoteCount, setUpvoteCount] = useState(0)
   const [commentText, setCommentText] = useState("")
   const [showAllComments, setShowAllComments] = useState(false)
+
+  useEffect(() => {
+    let active = true
+    setLoading(true)
+    Promise.all([fetchReportById(id), fetchCommentsByReport(id)])
+      .then(([reportRecord, commentRecords]) => {
+        if (!active) return
+        setReport(reportRecord)
+        setAllComments(commentRecords)
+        setComments(commentRecords.filter((c) => !c.parentId))
+        setLoading(false)
+      })
+      .catch(() => {
+        if (!active) return
+        setReport(null)
+        setAllComments([])
+        setComments([])
+        setLoading(false)
+      })
+    return () => {
+      active = false
+    }
+  }, [id])
+
+  useEffect(() => {
+    if (!report) return
+    const userId = user?.id || ""
+    setIsFollowing(report.followers.includes(userId))
+    setHasUpvoted(report.upvotes.includes(userId))
+    setUpvoteCount(report.upvoteCount)
+  }, [report, user?.id])
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center">
+        <p className="text-sm text-muted-foreground">Memuatkan...</p>
+      </div>
+    )
+  }
 
   if (!report) {
     return (
@@ -59,15 +101,43 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
 
   const creator = report.expand?.createdBy
 
-  const handleUpvote = () => {
+  const handleUpvote = async () => {
+    if (!user) {
+      toast.error(t("auth.pleaseSignIn"))
+      return
+    }
+    const nextUpvotes = hasUpvoted ? report.upvotes.filter((id) => id !== user.id) : [...report.upvotes, user.id]
+    const nextCount = hasUpvoted ? Math.max(0, upvoteCount - 1) : upvoteCount + 1
     setHasUpvoted(!hasUpvoted)
-    setUpvoteCount((c) => (hasUpvoted ? c - 1 : c + 1))
+    setUpvoteCount(nextCount)
+    setReport({ ...report, upvotes: nextUpvotes, upvoteCount: nextCount })
     toast.success(hasUpvoted ? t("report.upvoteRemoved") : t("report.upvoted"))
+    try {
+      await pb.collection("reports").update(report.id, {
+        upvotes: nextUpvotes,
+        upvoteCount: nextCount,
+      })
+    } catch (error) {
+      toast.error("Gagal. Sila cuba lagi.")
+    }
   }
 
-  const handleFollow = () => {
+  const handleFollow = async () => {
+    if (!user) {
+      toast.error(t("auth.pleaseSignIn"))
+      return
+    }
+    const nextFollowers = isFollowing ? report.followers.filter((id) => id !== user.id) : [...report.followers, user.id]
     setIsFollowing(!isFollowing)
+    setReport({ ...report, followers: nextFollowers })
     toast.success(isFollowing ? t("report.unfollowed") : t("report.following"))
+    try {
+      await pb.collection("reports").update(report.id, {
+        followers: nextFollowers,
+      })
+    } catch (error) {
+      toast.error("Gagal. Sila cuba lagi.")
+    }
   }
 
   const handleShare = async () => {
@@ -80,10 +150,29 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
     }
   }
 
-  const handleComment = () => {
-    if (!commentText.trim()) return
-    toast.success(t("report.commentPosted"))
-    setCommentText("")
+  const handleComment = async () => {
+    if (!commentText.trim() || !user) return
+    try {
+      const created = await pb.collection("comments").create({
+        reportId: report.id,
+        userId: user.id,
+        content: commentText.trim(),
+        photos: [],
+        parentId: null,
+        reactions: { like: [], support: [], urgent: [] },
+        isHidden: false,
+      })
+      const mapped = mapComment({
+        ...created,
+        expand: { userId: user },
+      })
+      setAllComments((prev) => [...prev, mapped])
+      setComments((prev) => [...prev, mapped])
+      toast.success(t("report.commentPosted"))
+      setCommentText("")
+    } catch (error) {
+      toast.error("Gagal. Sila cuba lagi.")
+    }
   }
 
   const handleFlag = () => {

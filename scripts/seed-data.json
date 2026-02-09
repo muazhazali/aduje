@@ -1,0 +1,268 @@
+{
+  "users": [
+    {
+      "email": "ahmad@gmail.com",
+      "name": "Ahmad bin Ibrahim",
+      "avatarSeed": "ahmad-seed",
+      "points": 450,
+      "badges": ["pemula", "penolong"],
+      "isPublic": true,
+      "isBanned": false,
+      "isAdmin": false,
+      "warnings": 0
+    },
+    {
+      "email": "siti@gmail.com",
+      "name": "Siti Nurhaliza",
+      "avatarSeed": "siti-seed",
+      "points": 780,
+      "badges": ["pemula", "penolong", "penyelesai"],
+      "isPublic": true,
+      "isBanned": false,
+      "isAdmin": false,
+      "warnings": 0
+    },
+    {
+      "email": "raj@gmail.com",
+      "name": "Raj Kumar",
+      "avatarSeed": "raj-seed",
+      "points": 320,
+      "badges": ["pemula"],
+      "isPublic": false,
+      "isBanned": false,
+      "isAdmin": false,
+      "warnings": 0
+    },
+    {
+      "email": "admin@example.com",
+      "name": "Admin Moderator",
+      "avatarSeed": "admin-seed",
+      "points": 1200,
+      "badges": ["pemula", "penolong", "penyelesai"],
+      "isPublic": true,
+      "isBanned": false,
+      "isAdmin": true,
+      "warnings": 0
+    },
+    {
+      "email": "mei@gmail.com",
+      "name": "Tan Mei Ling",
+      "avatarSeed": "mei-seed",
+      "points": 195,
+      "badges": ["pemula"],
+      "isPublic": true,
+      "isBanned": false,
+      "isAdmin": false,
+      "warnings": 0
+    },
+    {
+      "email": "ali@gmail.com",
+      "name": "Ali Hassan",
+      "avatarSeed": "ali-seed",
+      "points": 560,
+      "badges": ["pemula", "penolong"],
+      "isPublic": true,
+      "isBanned": false,
+      "isAdmin": false,
+      "warnings": 1
+    }
+  ],
+  "reports": [
+    {
+      "key": "rpt1",
+      "title": "Lubang besar di Jalan Ampang dekat KLCC",
+      "description": "Lubang sangat besar dan dalam di jalan utama. Sudah menyebabkan beberapa kereta rosak tayar. Sangat bahaya terutama waktu malam. Perlu dibaiki segera sebelum ada kemalangan.",
+      "category": "jalan_raya",
+      "latitude": 3.1569,
+      "longitude": 101.7123,
+      "address": "Jalan Ampang, 50450 Kuala Lumpur",
+      "landmark": "Near KLCC Twin Towers",
+      "status": "open",
+      "createdByEmail": "ahmad@gmail.com",
+      "followersEmails": ["ahmad@gmail.com", "siti@gmail.com", "raj@gmail.com"],
+      "upvotesEmails": ["siti@gmail.com", "raj@gmail.com", "mei@gmail.com", "ali@gmail.com"],
+      "confirmationsEmails": [],
+      "flaggedByEmails": [],
+      "isHidden": false,
+      "commentsLocked": false
+    },
+    {
+      "key": "rpt2",
+      "title": "Lampu jalan rosak di Taman Desa",
+      "description": "Lampu jalan di sepanjang jalan utama Taman Desa sudah rosak 3 minggu. Kawasan sangat gelap pada waktu malam. Penduduk rasa tidak selamat terutama wanita dan kanak-kanak.",
+      "category": "lampu_jalan",
+      "latitude": 3.1048,
+      "longitude": 101.6773,
+      "address": "Jalan Desa Utama, Taman Desa, 58100 KL",
+      "landmark": "Near Taman Desa Park",
+      "status": "acknowledged",
+      "createdByEmail": "siti@gmail.com",
+      "followersEmails": ["siti@gmail.com", "ahmad@gmail.com"],
+      "upvotesEmails": ["ahmad@gmail.com", "raj@gmail.com"],
+      "confirmationsEmails": [],
+      "flaggedByEmails": [],
+      "isHidden": false,
+      "commentsLocked": false
+    },
+    {
+      "key": "rpt3",
+      "title": "Sampah bertimbun di Pasar Chow Kit",
+      "description": "Sampah sarap bertimbun di tepi jalan dekat pasar. Bau sangat busuk dan menarik tikus serta lalat. Tong sampah penuh dan tidak dikutip selama seminggu.",
+      "category": "sampah_sarap",
+      "latitude": 3.1655,
+      "longitude": 101.6985,
+      "address": "Jalan Raja Muda, Chow Kit, 50300 KL",
+      "landmark": "Pasar Chow Kit area",
+      "status": "in_progress",
+      "createdByEmail": "raj@gmail.com",
+      "followersEmails": ["raj@gmail.com", "ahmad@gmail.com", "siti@gmail.com", "ali@gmail.com"],
+      "upvotesEmails": ["ahmad@gmail.com", "siti@gmail.com", "mei@gmail.com", "ali@gmail.com", "admin@example.com"],
+      "confirmationsEmails": [],
+      "flaggedByEmails": [],
+      "isHidden": false,
+      "commentsLocked": false
+    },
+    {
+      "key": "rpt4",
+      "title": "Longkang tersumbat di Bangsar South",
+      "description": "Longkang di tepi jalan tersumbat dengan sampah dan daun. Bila hujan lebat, air naik ke jalan dan membanjiri kawasan parking. Ini sudah terjadi 3 kali bulan ini.",
+      "category": "longkang_tersumbat",
+      "latitude": 3.1109,
+      "longitude": 101.6656,
+      "address": "Jalan Kerinchi, Bangsar South, 59200 KL",
+      "landmark": "Near The Vertical business suites",
+      "status": "closed",
+      "createdByEmail": "siti@gmail.com",
+      "followersEmails": ["siti@gmail.com", "mei@gmail.com"],
+      "upvotesEmails": ["ahmad@gmail.com", "mei@gmail.com"],
+      "confirmationsEmails": ["admin@example.com"],
+      "flaggedByEmails": [],
+      "isHidden": false,
+      "commentsLocked": false
+    },
+    {
+      "key": "rpt5",
+      "title": "Vandalisme di taman permainan Petaling Jaya",
+      "description": "Alat permainan kanak-kanak di taman telah dirosakkan dan dicatit dengan graffiti. Buaian patah dan berbahaya untuk kanak-kanak. Perlu dibaiki atau diganti.",
+      "category": "vandalisme",
+      "latitude": 3.1073,
+      "longitude": 101.6067,
+      "address": "Taman Jaya, Petaling Jaya, 46000",
+      "landmark": "Taman Jaya Playground",
+      "status": "open",
+      "createdByEmail": "mei@gmail.com",
+      "followersEmails": ["mei@gmail.com", "siti@gmail.com"],
+      "upvotesEmails": ["ahmad@gmail.com", "siti@gmail.com", "raj@gmail.com"],
+      "confirmationsEmails": [],
+      "flaggedByEmails": [],
+      "isHidden": false,
+      "commentsLocked": false
+    },
+    {
+      "key": "rpt6",
+      "title": "Kucing terbiar banyak di Shah Alam",
+      "description": "Ada lebih 10 ekor kucing terbiar di kawasan perumahan ini. Mereka kelihatan sakit dan kurus. Perlu bantuan daripada pihak berkuasa atau NGO haiwan.",
+      "category": "haiwan_terbiar",
+      "latitude": 3.0733,
+      "longitude": 101.5185,
+      "address": "Seksyen 7, Shah Alam, 40000",
+      "landmark": "Near Shah Alam Lake Gardens",
+      "status": "open",
+      "createdByEmail": "ali@gmail.com",
+      "followersEmails": ["ali@gmail.com", "siti@gmail.com"],
+      "upvotesEmails": ["siti@gmail.com"],
+      "confirmationsEmails": [],
+      "flaggedByEmails": [],
+      "isHidden": false,
+      "commentsLocked": false
+    }
+  ],
+  "comments": [
+    {
+      "key": "cmt1",
+      "reportKey": "rpt1",
+      "userEmail": "siti@gmail.com",
+      "content": "Saya juga nampak lubang ini semalam. Sangat bahaya! Harap pihak berkuasa cepat baiki.",
+      "parentKey": null,
+      "reactions": {
+        "like": ["ahmad@gmail.com", "raj@gmail.com"],
+        "support": ["mei@gmail.com"],
+        "urgent": ["ali@gmail.com"]
+      }
+    },
+    {
+      "key": "cmt2",
+      "reportKey": "rpt1",
+      "userEmail": "raj@gmail.com",
+      "content": "Tayar kereta saya rosak sebab lubang ini. Kena tukar tayar baru. DBKL perlu ambil tindakan!",
+      "parentKey": null,
+      "reactions": {
+        "like": ["ahmad@gmail.com"],
+        "support": ["siti@gmail.com", "ali@gmail.com"],
+        "urgent": []
+      }
+    },
+    {
+      "key": "cmt3",
+      "reportKey": "rpt1",
+      "userEmail": "ahmad@gmail.com",
+      "content": "Terima kasih semua yang upvote. Semoga pihak berkuasa nampak laporan ini.",
+      "parentKey": "cmt2",
+      "reactions": {
+        "like": ["siti@gmail.com"],
+        "support": [],
+        "urgent": []
+      }
+    },
+    {
+      "key": "cmt4",
+      "reportKey": "rpt3",
+      "userEmail": "admin@example.com",
+      "content": "Terima kasih atas laporan ini. Kami telah hubungi pihak SWCorp untuk kutip sampah. Dijangka selesai dalam 48 jam.",
+      "parentKey": null,
+      "reactions": {
+        "like": ["raj@gmail.com", "ahmad@gmail.com", "ali@gmail.com"],
+        "support": [],
+        "urgent": []
+      }
+    },
+    {
+      "key": "cmt5",
+      "reportKey": "rpt2",
+      "userEmail": "ali@gmail.com",
+      "content": "Kawasan ini memang gelap. Saya terpaksa guna lampu telefon setiap malam.",
+      "parentKey": null,
+      "reactions": {
+        "like": [],
+        "support": ["siti@gmail.com"],
+        "urgent": ["ahmad@gmail.com"]
+      }
+    }
+  ],
+  "notifications": [
+    {
+      "title": "Report upvoted",
+      "message": "Your report received 5 upvotes!",
+      "type": "upvote",
+      "userEmail": "ahmad@gmail.com",
+      "reportKey": "rpt1",
+      "commentKey": null
+    },
+    {
+      "title": "New comment",
+      "message": "Siti Nurhaliza commented on your report",
+      "type": "comment",
+      "userEmail": "ahmad@gmail.com",
+      "reportKey": "rpt1",
+      "commentKey": "cmt1"
+    },
+    {
+      "title": "Badge unlocked!",
+      "message": "You earned the Pemula badge!",
+      "type": "badge",
+      "userEmail": "ahmad@gmail.com",
+      "reportKey": null,
+      "commentKey": null
+    }
+  ]
+}

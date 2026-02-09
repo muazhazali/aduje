@@ -6,16 +6,24 @@ import { Header } from "./header"
 import { BottomNav } from "./bottom-nav"
 import { useStore } from "@/lib/store"
 import { useEffect } from "react"
-import { MOCK_USERS, MOCK_NOTIFICATIONS } from "@/lib/mock-data"
+import { fetchNotificationsByUser, getAuthUser } from "@/lib/pocketbase-data"
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { setUser, setNotifications, isAuthenticated } = useStore()
 
-  // Auto-login with mock user for demo
   useEffect(() => {
-    if (!isAuthenticated) {
-      setUser(MOCK_USERS[0]) // Login as Ahmad
-      setNotifications(MOCK_NOTIFICATIONS)
+    const authUser = getAuthUser()
+    if (authUser) {
+      setUser(authUser)
+      fetchNotificationsByUser(authUser.id)
+        .then(setNotifications)
+        .catch(() => setNotifications([]))
+      return
+    }
+
+    if (isAuthenticated) {
+      setUser(null)
+      setNotifications([])
     }
   }, [isAuthenticated, setUser, setNotifications])
 

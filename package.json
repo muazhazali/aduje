@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "pb:schema": "node scripts/pocketbase-schema.js",
+    "pb:seed": "node scripts/pocketbase-seed.js",
+    "pb:verify": "node scripts/verify-data.js",
+    "pb:test": "node scripts/test-api.js",
+    "pb:reset": "node scripts/recreate-collections.js && node scripts/pocketbase-seed.js && node scripts/verify-data.js"
   },
   "dependencies": {
     "@govtechmy/myds-react": "^1.0.2",
@@ -73,5 +78,6 @@
     "postcss": "^8.5",
     "tailwindcss": "^3.4.17",
     "typescript": "5.7.3"
-  }
+  },
+  "packageManager": "pnpm@10.29.2+sha512.bef43fa759d91fd2da4b319a5a0d13ef7a45bb985a3d7342058470f9d2051a3ba8674e629672654686ef9443ad13a82da2beb9eeb3e0221c87b8154fff9d74b8"
 }

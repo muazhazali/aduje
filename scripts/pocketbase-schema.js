@@ -1,14 +1,6 @@
-import fs from "fs"
-import path from "path"
-import PocketBase from "pocketbase"
-
-type CollectionModel = {
-  id: string
-  name: string
-  type: string
-  schema?: Array<Record<string, unknown>>
-  fields?: Array<Record<string, unknown>>
-}
+const fs = require("fs")
+const path = require("path")
+const PocketBase = require("pocketbase/cjs")
 
 function loadEnvFile() {
   const envPath = path.resolve(process.cwd(), ".env.local")
@@ -26,52 +18,96 @@ function loadEnvFile() {
   }
 }
 
-function mergeSchema(existing: Array<Record<string, any>>, desired: Array<Record<string, any>>) {
-  const byName = new Map(existing.map((field) => [field.name, field]))
+function mergeSchema(existing, desired) {
+  // Create a map of existing fields by name
+  const byName = new Map()
+  
+  // First, add all existing fields (preserving their IDs and system fields)
+  for (const field of existing) {
+    byName.set(field.name, { ...field })
+  }
+  
+  // Then merge in desired fields
   for (const field of desired) {
     const current = byName.get(field.name)
-    if (current) {
+    if (current && !current.system) {
+      // Update existing non-system field - preserve ID but update everything else
       byName.set(field.name, {
         ...current,
         ...field,
+        id: current.id, // Keep the existing field ID
         options: {
           ...(current.options || {}),
           ...(field.options || {}),
         },
       })
-    } else {
+    } else if (!current) {
+      // Add new field (without ID - PocketBase will generate it)
       byName.set(field.name, field)
     }
+    // Skip system fields - don't try to update them
   }
+  
   return Array.from(byName.values())
 }
 
-async function getCollections(pb: PocketBase) {
-  const list = await pb.collections.getList(1, 200)
-  return list.items as CollectionModel[]
-}
-
-async function ensureBaseCollections(pb: PocketBase, names: string[]) {
-  const existing = await getCollections(pb)
-  const existingMap = new Map(existing.map((c) => [c.name, c]))
-
+async function ensureBaseCollections(pb, names) {
   for (const name of names) {
-    if (!existingMap.has(name)) {
+    try {
+      await pb.collections.getOne(name)
+    } catch (error) {
       await pb.collections.create({
         name,
         type: "base",
-        schema: [],
+        fields: [],
       })
     }
   }
 }
 
-async function updateCollectionSchema(pb: PocketBase, name: string, schema: Array<Record<string, any>>) {
-  const collection = (await pb.collections.getOne(name)) as CollectionModel
-  const existingFields = collection.schema || collection.fields || []
-  const merged = mergeSchema(existingFields, schema)
-  const payload = collection.schema ? { schema: merged } : { fields: merged }
-  await pb.collections.update(collection.id, payload)
+async function updateCollectionSchema(pb, name, schema) {
+  try {
+    const collection = await pb.collections.getOne(name)
+    const existingFields = collection.fields || []
+    const merged = mergeSchema(existingFields, schema)
+    
+    // All collections use 'fields' in newer PocketBase versions
+    const payload = { fields: merged }
+    
+    console.log(`Updating ${name} collection (type: ${collection.type})...`)
+    await pb.collections.update(collection.id, payload)
+    console.log(`✓ Updated ${name} collection`)
+  } catch (error) {
+    console.error(`Failed to update ${name} collection:`)
+    if (error.response?.data?.fields) {
+      console.error("Field errors:", JSON.stringify(error.response.data.fields, null, 2))
+    } else {
+      console.error(error.response || error.message)
+    }
+    throw error
+  }
+}
+
+async function ensureAuthCollection(pb) {
+  try {
+    return await pb.collections.getOne("users")
+  } catch (error) {
+    console.log("Creating users auth collection...")
+    return await pb.collections.create({
+      name: "users",
+      type: "auth",
+      fields: [],
+      listRule: "",
+      viewRule: "",
+      createRule: "",
+      updateRule: "id = @request.auth.id",
+      deleteRule: null,
+      passwordAuth: {
+        enabled: true,
+        identityFields: ["email"],
+      },
+    })
+  }
 }
 
 async function main() {
@@ -82,18 +118,21 @@ async function main() {
   const adminPassword = process.env.POCKETBASE_SU_PASSWORD
 
   if (!baseUrl || !adminEmail || !adminPassword) {
-    throw new Error(
-      "Missing POCKETBASE_URL, POCKETBASE_SU_EMAIL, or POCKETBASE_SU_PASSWORD in .env.local",
-    )
+    throw new Error("Missing POCKETBASE_URL, POCKETBASE_SU_EMAIL, or POCKETBASE_SU_PASSWORD in .env.local")
   }
 
   const pb = new PocketBase(baseUrl)
-  await pb.admins.authWithPassword(adminEmail, adminPassword)
+  
+  // Authenticate as superuser
+  await pb.collection("_superusers").authWithPassword(adminEmail, adminPassword)
+
+  // Ensure auth collection exists first
+  const usersCollection = await ensureAuthCollection(pb)
 
   await ensureBaseCollections(pb, ["reports", "comments", "notifications", "audit_logs", "flags"])
 
-  const collections = await getCollections(pb)
-  const ids = new Map(collections.map((c) => [c.name, c.id]))
+  const reportsCollection = await pb.collections.getOne("reports")
+  const commentsCollection = await pb.collections.getOne("comments")
 
   const categoryValues = [
     "jalan_raya",
@@ -153,26 +192,26 @@ async function main() {
       name: "createdBy",
       type: "relation",
       required: true,
-      options: { collectionId: ids.get("users"), maxSelect: 1 },
+      options: { collectionId: usersCollection.id, maxSelect: 1 },
     },
     {
       name: "followers",
       type: "relation",
       required: false,
-      options: { collectionId: ids.get("users"), maxSelect: 999 },
+      options: { collectionId: usersCollection.id, maxSelect: 999 },
     },
     {
       name: "upvotes",
       type: "relation",
       required: false,
-      options: { collectionId: ids.get("users"), maxSelect: 999 },
+      options: { collectionId: usersCollection.id, maxSelect: 999 },
     },
     { name: "upvoteCount", type: "number", required: false, options: { min: 0 } },
     {
       name: "confirmations",
       type: "relation",
       required: false,
-      options: { collectionId: ids.get("users"), maxSelect: 999 },
+      options: { collectionId: usersCollection.id, maxSelect: 999 },
     },
     { name: "confirmationCount", type: "number", required: false, options: { min: 0 } },
     { name: "flagCount", type: "number", required: false, options: { min: 0 } },
@@ -180,7 +219,7 @@ async function main() {
       name: "flaggedBy",
       type: "relation",
       required: false,
-      options: { collectionId: ids.get("users"), maxSelect: 999 },
+      options: { collectionId: usersCollection.id, maxSelect: 999 },
     },
     { name: "isHidden", type: "bool", required: false },
     { name: "commentsLocked", type: "bool", required: false },
@@ -191,13 +230,13 @@ async function main() {
       name: "reportId",
       type: "relation",
       required: true,
-      options: { collectionId: ids.get("reports"), maxSelect: 1 },
+      options: { collectionId: reportsCollection.id, maxSelect: 1 },
     },
     {
       name: "userId",
       type: "relation",
       required: true,
-      options: { collectionId: ids.get("users"), maxSelect: 1 },
+      options: { collectionId: usersCollection.id, maxSelect: 1 },
     },
     { name: "content", type: "text", required: true, options: { max: 500 } },
     {
@@ -214,7 +253,7 @@ async function main() {
       name: "parentId",
       type: "relation",
       required: false,
-      options: { collectionId: ids.get("comments"), maxSelect: 1 },
+      options: { collectionId: commentsCollection.id, maxSelect: 1 },
     },
     {
       name: "reactions",
@@ -230,7 +269,7 @@ async function main() {
       name: "userId",
       type: "relation",
       required: true,
-      options: { collectionId: ids.get("users"), maxSelect: 1 },
+      options: { collectionId: usersCollection.id, maxSelect: 1 },
     },
     { name: "type", type: "text", required: true },
     { name: "title", type: "text", required: true },
@@ -239,13 +278,13 @@ async function main() {
       name: "relatedReportId",
       type: "relation",
       required: false,
-      options: { collectionId: ids.get("reports"), maxSelect: 1 },
+      options: { collectionId: reportsCollection.id, maxSelect: 1 },
     },
     {
       name: "relatedCommentId",
       type: "relation",
       required: false,
-      options: { collectionId: ids.get("comments"), maxSelect: 1 },
+      options: { collectionId: commentsCollection.id, maxSelect: 1 },
     },
     { name: "isRead", type: "bool", required: false },
   ])
@@ -255,7 +294,7 @@ async function main() {
       name: "adminId",
       type: "relation",
       required: true,
-      options: { collectionId: ids.get("users"), maxSelect: 1 },
+      options: { collectionId: usersCollection.id, maxSelect: 1 },
     },
     { name: "action", type: "text", required: true },
     { name: "targetType", type: "text", required: true },
@@ -269,19 +308,19 @@ async function main() {
       name: "reportId",
       type: "relation",
       required: false,
-      options: { collectionId: ids.get("reports"), maxSelect: 1 },
+      options: { collectionId: reportsCollection.id, maxSelect: 1 },
     },
     {
       name: "commentId",
       type: "relation",
       required: false,
-      options: { collectionId: ids.get("comments"), maxSelect: 1 },
+      options: { collectionId: commentsCollection.id, maxSelect: 1 },
     },
     {
       name: "flaggedBy",
       type: "relation",
       required: true,
-      options: { collectionId: ids.get("users"), maxSelect: 1 },
+      options: { collectionId: usersCollection.id, maxSelect: 1 },
     },
     { name: "reason", type: "text", required: true },
     { name: "status", type: "text", required: false, options: { defaultValue: "pending" } },
@@ -289,7 +328,7 @@ async function main() {
       name: "reviewedBy",
       type: "relation",
       required: false,
-      options: { collectionId: ids.get("users"), maxSelect: 1 },
+      options: { collectionId: usersCollection.id, maxSelect: 1 },
     },
   ])
 

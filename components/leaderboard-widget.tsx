@@ -4,13 +4,20 @@ import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { BoringAvatar } from "./boring-avatar"
 import { formatPoints } from "@/lib/helpers"
-import { LEADERBOARD_USERS } from "@/lib/mock-data"
 import { Trophy } from "lucide-react"
 import { useTranslations } from "next-intl"
+import { useEffect, useState } from "react"
+import { fetchLeaderboardUsers, type LeaderboardUser } from "@/lib/pocketbase-data"
 
 export function LeaderboardWidget() {
-  const top5 = LEADERBOARD_USERS.slice(0, 5)
+  const [top5, setTop5] = useState<LeaderboardUser[]>([])
   const t = useTranslations()
+
+  useEffect(() => {
+    fetchLeaderboardUsers()
+      .then((users) => setTop5(users.slice(0, 5)))
+      .catch(() => setTop5([]))
+  }, [])
 
   return (
     <Card>

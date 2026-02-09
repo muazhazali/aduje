@@ -1,8 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useStore } from "@/lib/store"
-import { MOCK_REPORTS, MOCK_USERS } from "@/lib/mock-data"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
@@ -33,69 +32,109 @@ import {
 import { toast } from "sonner"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
+import { fetchAuditLogs, fetchReports, fetchUsers } from "@/lib/pocketbase-data"
+import type { AuditLog, Report, User } from "@/lib/types"
+import pb from "@/lib/pocketbase"
 
 export default function AdminDashboardPage() {
   const { user } = useStore()
   const t = useTranslations()
+  const [reports, setReports] = useState<Report[]>([])
+  const [users, setUsers] = useState<User[]>([])
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([])
+  const [totalComments, setTotalComments] = useState(0)
+
+  useEffect(() => {
+    fetchReports()
+      .then(setReports)
+      .catch(() => setReports([]))
+    fetchUsers()
+      .then(setUsers)
+      .catch(() => setUsers([]))
+    fetchAuditLogs()
+      .then(setAuditLogs)
+      .catch(() => setAuditLogs([]))
+    pb.collection("comments")
+      .getList(1, 1)
+      .then((list) => setTotalComments(list.totalItems))
+      .catch(() => setTotalComments(0))
+  }, [])
 
   // For demo, show admin dashboard even if user is not admin
-  const allReports = MOCK_REPORTS
+  const allReports = reports
   const flaggedReports = allReports.filter((r) => r.flagCount > 0)
-  const allUsers = MOCK_USERS
-  const [auditLogs] = useState([
-    {
-      id: "log1",
-      admin: "Admin Moderator",
-      action: t("admin.logs.changedStatus"),
-      target: t("admin.logs.sampleReport1"),
-      time: "2026-02-08T10:00:00Z",
-      details: "open -> acknowledged",
-    },
-    {
-      id: "log2",
-      admin: "Admin Moderator",
-      action: t("admin.logs.postedComment"),
-      target: t("admin.logs.sampleReport2"),
-      time: "2026-02-07T10:00:00Z",
-      details: t("admin.logs.officialUpdate"),
-    },
-    {
-      id: "log3",
-      admin: "Admin Moderator",
-      action: t("admin.logs.warnedUser"),
-      target: t("admin.logs.sampleUser"),
-      time: "2026-02-06T09:00:00Z",
-      details: t("admin.logs.repeatSpam"),
-    },
-  ])
+  const allUsers = users
 
   const openCount = allReports.filter((r) => r.status === "open").length
   const inProgressCount = allReports.filter((r) => r.status === "in_progress").length
   const closedCount = allReports.filter((r) => r.status === "closed").length
-  const totalComments = 5
-
-  const handleStatusChange = (reportId: string, newStatus: string) => {
-    toast.success(t("admin.toast.statusUpdated", { status: t(`status.${newStatus as ReportStatus}`) }))
+  const handleStatusChange = async (reportId: string, newStatus: string) => {
+    try {
+      await pb.collection("reports").update(reportId, { status: newStatus })
+      setReports((prev) => prev.map((r) => (r.id === reportId ? { ...r, status: newStatus as ReportStatus } : r)))
+      toast.success(t("admin.toast.statusUpdated", { status: t(`status.${newStatus as ReportStatus}`) }))
+    } catch (error) {
+      toast.error("Gagal. Sila cuba lagi.")
+    }
   }
 
-  const handleHideReport = (reportId: string) => {
-    toast.success(t("admin.toast.reportHidden"))
+  const handleHideReport = async (reportId: string) => {
+    const report = allReports.find((r) => r.id === reportId)
+    if (!report) return
+    const nextValue = !report.isHidden
+    try {
+      await pb.collection("reports").update(reportId, { isHidden: nextValue })
+      setReports((prev) => prev.map((r) => (r.id === reportId ? { ...r, isHidden: nextValue } : r)))
+      toast.success(t("admin.toast.reportHidden"))
+    } catch (error) {
+      toast.error("Gagal. Sila cuba lagi.")
+    }
   }
 
-  const handleLockComments = (reportId: string) => {
-    toast.success(t("admin.toast.commentsLocked"))
+  const handleLockComments = async (reportId: string) => {
+    const report = allReports.find((r) => r.id === reportId)
+    if (!report) return
+    const nextValue = !report.commentsLocked
+    try {
+      await pb.collection("reports").update(reportId, { commentsLocked: nextValue })
+      setReports((prev) => prev.map((r) => (r.id === reportId ? { ...r, commentsLocked: nextValue } : r)))
+      toast.success(t("admin.toast.commentsLocked"))
+    } catch (error) {
+      toast.error("Gagal. Sila cuba lagi.")
+    }
   }
 
-  const handleWarnUser = (userId: string) => {
-    toast.success(t("admin.toast.warningSent"))
+  const handleWarnUser = async (userId: string) => {
+    const target = allUsers.find((u) => u.id === userId)
+    if (!target) return
+    const nextWarnings = (target.warnings || 0) + 1
+    try {
+      await pb.collection("users").update(userId, { warnings: nextWarnings })
+      setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, warnings: nextWarnings } : u)))
+      toast.success(t("admin.toast.warningSent"))
+    } catch (error) {
+      toast.error("Gagal. Sila cuba lagi.")
+    }
   }
 
-  const handleBanUser = (userId: string) => {
-    toast.success(t("admin.toast.userBanned"))
+  const handleBanUser = async (userId: string) => {
+    try {
+      await pb.collection("users").update(userId, { isBanned: true })
+      setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, isBanned: true } : u)))
+      toast.success(t("admin.toast.userBanned"))
+    } catch (error) {
+      toast.error("Gagal. Sila cuba lagi.")
+    }
   }
 
-  const handleUnbanUser = (userId: string) => {
-    toast.success(t("admin.toast.userUnbanned"))
+  const handleUnbanUser = async (userId: string) => {
+    try {
+      await pb.collection("users").update(userId, { isBanned: false })
+      setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, isBanned: false } : u)))
+      toast.success(t("admin.toast.userUnbanned"))
+    } catch (error) {
+      toast.error("Gagal. Sila cuba lagi.")
+    }
   }
 
   return (
@@ -348,12 +387,14 @@ export default function AdminDashboardPage() {
                   <div key={log.id} className="flex items-start gap-3 border-l-2 border-border pl-3">
                     <div className="flex-1">
                       <p className="text-sm text-foreground">
-                        <span className="font-medium">{log.admin}</span>
-                        {" "}{log.action}
+                        <span className="font-medium">{log.expand?.adminId?.name || log.adminId}</span>{" "}
+                        {log.action}
                       </p>
-                      <p className="text-xs text-muted-foreground">{log.target}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {log.targetType} - {log.targetId}
+                      </p>
                       {log.details && <p className="text-xs text-muted-foreground italic">{log.details}</p>}
-                      <p className="mt-0.5 text-xs text-muted-foreground">{formatRelativeTime(log.time)}</p>
+                      <p className="mt-0.5 text-xs text-muted-foreground">{formatRelativeTime(log.created)}</p>
                     </div>
                   </div>
                 ))}

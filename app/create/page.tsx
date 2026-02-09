@@ -10,20 +10,23 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { REPORT_CATEGORIES, type ReportCategory } from "@/lib/types"
-import { MOCK_REPORTS } from "@/lib/mock-data"
-import { getDistanceKm, generateId } from "@/lib/helpers"
+import { getDistanceKm } from "@/lib/helpers"
 import { useStore } from "@/lib/store"
 import { StatusBadge } from "@/components/status-badge"
 import { MapPin, Upload, CheckCircle, AlertTriangle, ArrowLeft, ArrowRight, Loader2, Navigation } from "lucide-react"
 import { toast } from "sonner"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
+import { fetchReportById, fetchReports } from "@/lib/pocketbase-data"
+import type { Report } from "@/lib/types"
+import pb from "@/lib/pocketbase"
 
 export default function CreateReportPage() {
   const router = useRouter()
   const { user, addReport } = useStore()
   const [step, setStep] = useState(0)
   const t = useTranslations()
+  const [reports, setReports] = useState<Report[]>([])
 
   // Form state
   const [title, setTitle] = useState("")
@@ -36,7 +39,7 @@ export default function CreateReportPage() {
   const [address, setAddress] = useState("")
   const [landmark, setLandmark] = useState("")
   const [locating, setLocating] = useState(false)
-  const [duplicates, setDuplicates] = useState<typeof MOCK_REPORTS>([])
+  const [duplicates, setDuplicates] = useState<Report[]>([])
   const [submitting, setSubmitting] = useState(false)
 
   const mapRef = useRef<HTMLDivElement>(null)
@@ -117,10 +120,16 @@ export default function CreateReportPage() {
     }
   }, [step, latitude, longitude])
 
+  useEffect(() => {
+    fetchReports()
+      .then(setReports)
+      .catch(() => setReports([]))
+  }, [])
+
   // Duplicate check
   useEffect(() => {
     if (step === 3 && category) {
-      const nearby = MOCK_REPORTS.filter(
+      const nearby = reports.filter(
         (r) =>
           r.status !== "draft" &&
           r.category === category &&
@@ -162,40 +171,48 @@ export default function CreateReportPage() {
     return true
   }
 
-  const handleSubmit = () => {
-    setSubmitting(true)
-    const newReport = {
-      id: generateId(),
-      title,
-      description,
-      category: category as ReportCategory,
-      photos: photoPreviews,
-      latitude,
-      longitude,
-      address,
-      landmark,
-      status: "open" as const,
-      createdBy: user?.id || "user1",
-      followers: [user?.id || "user1"],
-      upvotes: [],
-      upvoteCount: 0,
-      confirmations: [],
-      confirmationCount: 0,
-      flagCount: 0,
-      flaggedBy: [],
-      isHidden: false,
-      commentsLocked: false,
-      created: new Date().toISOString(),
-      updated: new Date().toISOString(),
-      expand: { createdBy: user || undefined },
+  const handleSubmit = async () => {
+    if (!user) {
+      toast.error(t("auth.pleaseSignIn"))
+      return
     }
+    setSubmitting(true)
+    try {
+      const payload = {
+        title,
+        description,
+        category: category as ReportCategory,
+        latitude,
+        longitude,
+        address,
+        landmark,
+        status: "open",
+        createdBy: user.id,
+        followers: [user.id],
+        upvotes: [],
+        upvoteCount: 0,
+        confirmations: [],
+        confirmationCount: 0,
+        flagCount: 0,
+        flaggedBy: [],
+        isHidden: false,
+        commentsLocked: false,
+      } as Record<string, any>
 
-    setTimeout(() => {
-      addReport(newReport)
+      if (photoFiles.length > 0) {
+        payload.photos = photoFiles
+      }
+
+      const created = await pb.collection("reports").create(payload)
+      const hydrated = await fetchReportById(created.id)
+      addReport(hydrated)
       setSubmitting(false)
       toast.success(t("create.submitted"))
       router.push("/")
-    }, 1000)
+    } catch (error) {
+      setSubmitting(false)
+      toast.error("Gagal. Sila cuba lagi.")
+    }
   }
 
   const steps = [t("create.steps.basic"), t("create.steps.photos"), t("create.steps.location"), t("create.steps.review")]

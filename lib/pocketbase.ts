@@ -1,6 +1,7 @@
 import PocketBase from "pocketbase"
 
-const pb = new PocketBase(process.env.NEXT_PUBLIC_POCKETBASE_URL || "https://your-pb.pockethost.io")
+const baseUrl = process.env.NEXT_PUBLIC_POCKETBASE_URL || process.env.POCKETBASE_URL
+const pb = new PocketBase(baseUrl || "")
 
 export default pb
 

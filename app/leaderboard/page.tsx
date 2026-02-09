@@ -2,7 +2,6 @@
 
 import React from "react"
 
-import { LEADERBOARD_USERS } from "@/lib/mock-data"
 import { BoringAvatar } from "@/components/boring-avatar"
 import { formatPoints } from "@/lib/helpers"
 import { useStore } from "@/lib/store"
@@ -11,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Trophy, Medal, Award, Target, Handshake, Star } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useTranslations } from "next-intl"
+import { useEffect, useState } from "react"
+import { fetchLeaderboardUsers, type LeaderboardUser } from "@/lib/pocketbase-data"
 
 const BADGE_ICONS: Record<string, React.ElementType> = {
   pemula: Target,
@@ -29,6 +30,13 @@ const RANK_ICONS = [Trophy, Medal, Award]
 export default function LeaderboardPage() {
   const { user } = useStore()
   const t = useTranslations()
+  const [leaderboardUsers, setLeaderboardUsers] = useState<LeaderboardUser[]>([])
+
+  useEffect(() => {
+    fetchLeaderboardUsers()
+      .then(setLeaderboardUsers)
+      .catch(() => setLeaderboardUsers([]))
+  }, [])
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6">
@@ -47,7 +55,7 @@ export default function LeaderboardPage() {
         <TabsContent value="all-time" className="mt-4">
           {/* Top 3 podium */}
           <div className="mb-6 grid grid-cols-3 gap-3">
-            {LEADERBOARD_USERS.slice(0, 3).map((u, i) => {
+            {leaderboardUsers.slice(0, 3).map((u, i) => {
               const RankIcon = RANK_ICONS[i]
               return (
                 <Card key={u.id} className={cn("text-center", i === 0 && "order-2", i === 1 && "order-1", i === 2 && "order-3")}>
@@ -76,7 +84,7 @@ export default function LeaderboardPage() {
             </CardHeader>
             <CardContent>
               <div className="flex flex-col">
-                {LEADERBOARD_USERS.map((u) => {
+                {leaderboardUsers.map((u) => {
                   const isCurrentUser = u.id === user?.id
                   return (
                     <div

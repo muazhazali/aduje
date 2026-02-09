@@ -1,7 +1,6 @@
 "use client"
 
 import { useStore } from "@/lib/store"
-import { MOCK_REPORTS } from "@/lib/mock-data"
 import { BoringAvatar } from "@/components/boring-avatar"
 import { ReportCard } from "@/components/report-card"
 import { formatPoints } from "@/lib/helpers"
@@ -14,10 +13,21 @@ import { Trophy, FileText, Eye, LogOut, Target, Handshake, Star } from "lucide-r
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { useTranslations } from "next-intl"
+import { useEffect, useState } from "react"
+import { fetchReports } from "@/lib/pocketbase-data"
+import type { Report } from "@/lib/types"
+import pb from "@/lib/pocketbase"
 
 export default function ProfilePage() {
   const { user, setUser, logout } = useStore()
   const t = useTranslations()
+  const [reports, setReports] = useState<Report[]>([])
+
+  useEffect(() => {
+    fetchReports()
+      .then(setReports)
+      .catch(() => setReports([]))
+  }, [])
 
   if (!user) {
     return (
@@ -27,8 +37,8 @@ export default function ProfilePage() {
     )
   }
 
-  const myReports = MOCK_REPORTS.filter((r) => r.createdBy === user.id)
-  const followedReports = MOCK_REPORTS.filter((r) => r.followers.includes(user.id) && r.createdBy !== user.id)
+  const myReports = reports.filter((r) => r.createdBy === user.id)
+  const followedReports = reports.filter((r) => r.followers.includes(user.id) && r.createdBy !== user.id)
 
   const badgeInfo = {
     pemula: {
@@ -51,9 +61,16 @@ export default function ProfilePage() {
     },
   }
 
-  const handleTogglePublic = () => {
-    setUser({ ...user, isPublic: !user.isPublic })
-    toast.success(user.isPublic ? t("profile.privateToast") : t("profile.publicToast"))
+  const handleTogglePublic = async () => {
+    const nextValue = !user.isPublic
+    setUser({ ...user, isPublic: nextValue })
+    try {
+      await pb.collection("users").update(user.id, { isPublic: nextValue })
+      toast.success(nextValue ? t("profile.publicToast") : t("profile.privateToast"))
+    } catch (error) {
+      setUser({ ...user, isPublic: user.isPublic })
+      toast.error("Gagal. Sila cuba lagi.")
+    }
   }
 
   return (
@@ -118,6 +135,7 @@ export default function ProfilePage() {
               variant="ghost"
               size="sm"
               onClick={() => {
+                pb.authStore.clear()
                 logout()
                 toast.success(t("auth.loggedOut"))
               }}

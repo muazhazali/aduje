@@ -1,7 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
-import { MOCK_REPORTS } from "@/lib/mock-data"
+import { useState, useMemo, useEffect } from "react"
 import { ReportCard } from "@/components/report-card"
 import { FeedFilters } from "@/components/feed-filters"
 import { LeaderboardWidget } from "@/components/leaderboard-widget"
@@ -9,6 +8,8 @@ import { Input } from "@govtechmy/myds-react/input"
 import { Search, FileWarning } from "lucide-react"
 import type { ReportCategory, ReportStatus } from "@/lib/types"
 import { useTranslations } from "next-intl"
+import { fetchReports } from "@/lib/pocketbase-data"
+import type { Report } from "@/lib/types"
 
 export default function FeedPage() {
   const t = useTranslations()
@@ -16,33 +17,40 @@ export default function FeedPage() {
   const [category, setCategory] = useState("all")
   const [status, setStatus] = useState("all")
   const [sortBy, setSortBy] = useState("recent")
+  const [reports, setReports] = useState<Report[]>([])
+
+  useEffect(() => {
+    fetchReports()
+      .then(setReports)
+      .catch(() => setReports([]))
+  }, [])
 
   const filtered = useMemo(() => {
-    let reports = MOCK_REPORTS.filter((r) => r.status !== "draft" && !r.isHidden)
+    let filteredReports = reports.filter((r) => r.status !== "draft" && !r.isHidden)
 
     if (search.trim()) {
       const q = search.toLowerCase()
-      reports = reports.filter(
+      filteredReports = filteredReports.filter(
         (r) => r.title.toLowerCase().includes(q) || r.description.toLowerCase().includes(q) || r.address.toLowerCase().includes(q),
       )
     }
 
     if (category !== "all") {
-      reports = reports.filter((r) => r.category === (category as ReportCategory))
+      filteredReports = filteredReports.filter((r) => r.category === (category as ReportCategory))
     }
 
     if (status !== "all") {
-      reports = reports.filter((r) => r.status === (status as ReportStatus))
+      filteredReports = filteredReports.filter((r) => r.status === (status as ReportStatus))
     }
 
     if (sortBy === "upvoted") {
-      reports = [...reports].sort((a, b) => b.upvoteCount - a.upvoteCount)
+      filteredReports = [...filteredReports].sort((a, b) => b.upvoteCount - a.upvoteCount)
     } else {
-      reports = [...reports].sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime())
+      filteredReports = [...filteredReports].sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime())
     }
 
-    return reports
-  }, [search, category, status, sortBy])
+    return filteredReports
+  }, [search, category, status, sortBy, reports])
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-4">

@@ -1,12 +1,13 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import { MOCK_REPORTS } from "@/lib/mock-data"
 import { REPORT_STATUSES, type ReportCategory, type ReportStatus } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { List } from "lucide-react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
+import { fetchReports } from "@/lib/pocketbase-data"
+import type { Report } from "@/lib/types"
 
 const STATUS_MARKER_COLORS: Record<ReportStatus, string> = {
   draft: "#6B7280",
@@ -19,11 +20,19 @@ const STATUS_MARKER_COLORS: Record<ReportStatus, string> = {
 export default function MapPage() {
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<unknown>(null)
+  const markersRef = useRef<unknown[]>([])
   const [loaded, setLoaded] = useState(false)
+  const [reports, setReports] = useState<Report[]>([])
   const t = useTranslations()
 
   const getCategoryLabel = useCallback((category: ReportCategory) => t(`categories.${category}`), [t])
   const getStatusLabel = useCallback((status: ReportStatus) => t(`status.${status}`), [t])
+
+  useEffect(() => {
+    fetchReports()
+      .then(setReports)
+      .catch(() => setReports([]))
+  }, [])
 
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return
@@ -48,31 +57,6 @@ export default function MapPage() {
         attribution: "&copy; OpenStreetMap contributors",
       }).addTo(map)
 
-      const reports = MOCK_REPORTS.filter((r) => r.status !== "draft" && !r.isHidden)
-
-      for (const report of reports) {
-        const color = STATUS_MARKER_COLORS[report.status]
-        const categoryLabel = getCategoryLabel(report.category)
-        const statusLabel = getStatusLabel(report.status)
-        const icon = L.divIcon({
-          className: "",
-          html: `<div style="width:24px;height:24px;border-radius:50%;background:${color};border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>`,
-          iconSize: [24, 24],
-          iconAnchor: [12, 12],
-        })
-
-        L.marker([report.latitude, report.longitude], { icon })
-          .addTo(map)
-          .bindPopup(
-            `<div style="min-width:200px">
-              <strong style="font-size:13px">${report.title}</strong><br/>
-              <span style="font-size:11px;color:#666">${categoryLabel}</span><br/>
-              <span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;color:white;background:${color};margin-top:4px">${statusLabel}</span><br/>
-              <a href="/report/${report.id}" style="font-size:11px;color:#CC0001;margin-top:6px;display:inline-block">${t("map.viewDetails")} &rarr;</a>
-            </div>`,
-          )
-      }
-
       mapInstanceRef.current = map
       setLoaded(true)
 
@@ -88,6 +72,45 @@ export default function MapPage() {
       }
     }
   }, [getCategoryLabel, getStatusLabel, t])
+
+  useEffect(() => {
+    if (!mapInstanceRef.current) return
+    // biome-ignore lint: dynamic typing for Leaflet
+    const L = (window as any).L
+    if (!L) return
+
+    for (const marker of markersRef.current) {
+      // biome-ignore lint: dynamic typing
+      ;(marker as any).remove()
+    }
+    markersRef.current = []
+
+    const visibleReports = reports.filter((r) => r.status !== "draft" && !r.isHidden)
+    for (const report of visibleReports) {
+      const color = STATUS_MARKER_COLORS[report.status]
+      const categoryLabel = getCategoryLabel(report.category)
+      const statusLabel = getStatusLabel(report.status)
+      const icon = L.divIcon({
+        className: "",
+        html: `<div style="width:24px;height:24px;border-radius:50%;background:${color};border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>`,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+      })
+
+      const marker = L.marker([report.latitude, report.longitude], { icon })
+        // biome-ignore lint: dynamic typing
+        .addTo(mapInstanceRef.current as any)
+        .bindPopup(
+          `<div style="min-width:200px">
+            <strong style="font-size:13px">${report.title}</strong><br/>
+            <span style="font-size:11px;color:#666">${categoryLabel}</span><br/>
+            <span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;color:white;background:${color};margin-top:4px">${statusLabel}</span><br/>
+            <a href="/report/${report.id}" style="font-size:11px;color:#CC0001;margin-top:6px;display:inline-block">${t("map.viewDetails")} &rarr;</a>
+          </div>`,
+        )
+      markersRef.current.push(marker)
+    }
+  }, [reports, getCategoryLabel, getStatusLabel, t])
 
   return (
     <div className="relative" style={{ height: "calc(100vh - 3.5rem - 4rem)" }}>
