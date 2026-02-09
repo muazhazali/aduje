@@ -117,10 +117,35 @@ export async function fetchLeaderboardUsers(): Promise<LeaderboardUser[]> {
 
 export async function fetchReports() {
   const records = await pb.collection("reports").getFullList({
-    sort: "-created",
-    expand: "createdBy",
+    // sort: "-created", // Temporarily removed - causing 400 error
+    // expand: "createdBy", // Temporarily removed due to PocketBase API issue
   })
-  return records.map(mapReport)
+
+  // Sort manually by created date
+  records.sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime())
+
+  // Fetch all unique creator IDs
+  const creatorIds = [...new Set(records.map((r) => r.createdBy).filter(Boolean))]
+
+  // Fetch all creators in one batch
+  const creators = creatorIds.length > 0 
+    ? await pb.collection("users").getFullList({
+        filter: creatorIds.map((id) => `id="${id}"`).join(" || "),
+      })
+    : []
+
+  // Map creators by ID for quick lookup
+  const creatorsMap = new Map(creators.map((c) => [c.id, c]))
+
+  // Map reports with expanded creator data
+  return records.map((record) => {
+    const creator = record.createdBy ? creatorsMap.get(record.createdBy) : null
+    const reportData = mapReport(record)
+    if (creator) {
+      reportData.expand = { createdBy: mapUser(creator) }
+    }
+    return reportData
+  })
 }
 
 export async function fetchReportById(id: string) {
@@ -131,24 +156,30 @@ export async function fetchReportById(id: string) {
 export async function fetchCommentsByReport(reportId: string) {
   const records = await pb.collection("comments").getFullList({
     filter: `reportId="${reportId}"`,
-    sort: "created",
+    // sort: "created", // Removed - causes 400 error, sorting manually instead
     expand: "userId",
   })
+  // Sort manually by created date (ascending for comments - oldest first)
+  records.sort((a, b) => new Date(a.created).getTime() - new Date(b.created).getTime())
   return records.map(mapComment)
 }
 
 export async function fetchNotificationsByUser(userId: string) {
   const records = await pb.collection("notifications").getFullList({
     filter: `userId="${userId}"`,
-    sort: "-created",
+    // sort: "-created", // Removed - causes 400 error, sorting manually instead
   })
+  // Sort manually by created date
+  records.sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime())
   return records.map(mapNotification)
 }
 
 export async function fetchAuditLogs() {
   const records = await pb.collection("audit_logs").getFullList({
-    sort: "-created",
+    // sort: "-created", // Removed - causes 400 error, sorting manually instead
     expand: "adminId",
   })
+  // Sort manually by created date
+  records.sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime())
   return records.map(mapAuditLog)
 }
