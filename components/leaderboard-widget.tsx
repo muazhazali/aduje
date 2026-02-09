@@ -6,16 +6,18 @@ import { BoringAvatar } from "./boring-avatar"
 import { formatPoints } from "@/lib/helpers"
 import { LEADERBOARD_USERS } from "@/lib/mock-data"
 import { Trophy } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 export function LeaderboardWidget() {
   const top5 = LEADERBOARD_USERS.slice(0, 5)
+  const t = useTranslations()
 
   return (
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-sm font-semibold">
           <Trophy className="h-4 w-4 text-secondary" />
-          Top Community Members
+          {t("leaderboard.topCommunity")}
         </CardTitle>
       </CardHeader>
       <CardContent className="pb-4">
@@ -29,7 +31,9 @@ export function LeaderboardWidget() {
               <div className="flex-1 min-w-0">
                 <p className="truncate text-sm font-medium text-foreground">{user.name}</p>
               </div>
-              <span className="text-xs font-semibold text-primary">{formatPoints(user.points)} pts</span>
+              <span className="text-xs font-semibold text-primary">
+                {formatPoints(user.points)} {t("common.pointsShort")}
+              </span>
             </div>
           ))}
         </div>
@@ -37,7 +41,7 @@ export function LeaderboardWidget() {
           href="/leaderboard"
           className="mt-3 block text-center text-xs font-medium text-primary hover:underline"
         >
-          View Full Leaderboard
+          {t("leaderboard.viewFull")}
         </Link>
       </CardContent>
     </Card>

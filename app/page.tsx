@@ -5,11 +5,13 @@ import { MOCK_REPORTS } from "@/lib/mock-data"
 import { ReportCard } from "@/components/report-card"
 import { FeedFilters } from "@/components/feed-filters"
 import { LeaderboardWidget } from "@/components/leaderboard-widget"
-import { Input } from "@/components/ui/input"
+import { Input } from "@govtechmy/myds-react/input"
 import { Search, FileWarning } from "lucide-react"
 import type { ReportCategory, ReportStatus } from "@/lib/types"
+import { useTranslations } from "next-intl"
 
 export default function FeedPage() {
+  const t = useTranslations()
   const [search, setSearch] = useState("")
   const [category, setCategory] = useState("all")
   const [status, setStatus] = useState("all")
@@ -46,15 +48,15 @@ export default function FeedPage() {
     <div className="mx-auto max-w-6xl px-4 py-4">
       {/* Hero */}
       <div className="mb-6 rounded-xl bg-primary px-6 py-6 text-primary-foreground">
-        <h1 className="text-balance text-xl font-bold sm:text-2xl">Report Local Issues in Your Community</h1>
+        <h1 className="text-balance text-xl font-bold sm:text-2xl">{t("feed.heroTitle")}</h1>
         <p className="mt-1 text-sm opacity-90">
-          Help improve Malaysia, one report at a time. Jom buat laporan!
+          {t("feed.heroSubtitle")}
         </p>
         <div className="relative mt-4 max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary" />
           <Input
             type="search"
-            placeholder="Search reports..."
+            placeholder={t("search.placeholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="h-10 border-0 bg-card pl-9 text-foreground placeholder:text-muted-foreground"
@@ -84,8 +86,8 @@ export default function FeedPage() {
           {filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-16">
               <FileWarning className="h-12 w-12 text-muted-foreground" />
-              <p className="mt-3 text-sm font-medium text-muted-foreground">No reports found</p>
-              <p className="text-xs text-muted-foreground">Try adjusting your filters or search term</p>
+              <p className="mt-3 text-sm font-medium text-muted-foreground">{t("feed.emptyTitle")}</p>
+              <p className="text-xs text-muted-foreground">{t("feed.emptySubtitle")}</p>
             </div>
           ) : (
             <div className="flex flex-col gap-3">

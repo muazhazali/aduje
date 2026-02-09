@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { CATEGORY_LABELS, type ReportCategory } from "@/lib/types"
+import { REPORT_CATEGORIES, type ReportCategory } from "@/lib/types"
 import { MOCK_REPORTS } from "@/lib/mock-data"
 import { getDistanceKm, generateId } from "@/lib/helpers"
 import { useStore } from "@/lib/store"
@@ -17,13 +17,13 @@ import { StatusBadge } from "@/components/status-badge"
 import { MapPin, Upload, CheckCircle, AlertTriangle, ArrowLeft, ArrowRight, Loader2, Navigation } from "lucide-react"
 import { toast } from "sonner"
 import Link from "next/link"
-
-const STEPS = ["Basic Info", "Photos", "Location", "Review"]
+import { useTranslations } from "next-intl"
 
 export default function CreateReportPage() {
   const router = useRouter()
   const { user, addReport } = useStore()
   const [step, setStep] = useState(0)
+  const t = useTranslations()
 
   // Form state
   const [title, setTitle] = useState("")
@@ -46,7 +46,7 @@ export default function CreateReportPage() {
   // Auto-detect location
   const detectLocation = useCallback(() => {
     if (!navigator.geolocation) {
-      toast.error("Geolocation not supported by your browser")
+      toast.error(t("create.geoNotSupported"))
       return
     }
     setLocating(true)
@@ -55,15 +55,15 @@ export default function CreateReportPage() {
         setLatitude(pos.coords.latitude)
         setLongitude(pos.coords.longitude)
         setLocating(false)
-        toast.success("Location detected!")
+        toast.success(t("create.locationDetected"))
       },
       () => {
         setLocating(false)
-        toast.error("Unable to get location. Using default KL location.")
+        toast.error(t("create.locationFailed"))
       },
       { enableHighAccuracy: true },
     )
-  }, [])
+  }, [t])
 
   // Init map on step 2
   useEffect(() => {
@@ -133,12 +133,12 @@ export default function CreateReportPage() {
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
     if (photoFiles.length + files.length > 5) {
-      toast.error("Maximum 5 photos allowed")
+      toast.error(t("create.maxPhotos"))
       return
     }
     const newFiles = files.filter((f) => f.size <= 5 * 1024 * 1024)
     if (newFiles.length < files.length) {
-      toast.error("Some files were too large (max 5MB)")
+      toast.error(t("create.photoTooLarge"))
     }
     setPhotoFiles((prev) => [...prev, ...newFiles])
     for (const f of newFiles) {
@@ -193,23 +193,25 @@ export default function CreateReportPage() {
     setTimeout(() => {
       addReport(newReport)
       setSubmitting(false)
-      toast.success("Report submitted! +10 points")
+      toast.success(t("create.submitted"))
       router.push("/")
     }, 1000)
   }
+
+  const steps = [t("create.steps.basic"), t("create.steps.photos"), t("create.steps.location"), t("create.steps.review")]
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-4">
       <Button variant="ghost" size="sm" onClick={() => router.back()} className="mb-3 gap-1.5 text-muted-foreground">
         <ArrowLeft className="h-4 w-4" />
-        Back
+        {t("actions.back")}
       </Button>
 
-      <h1 className="mb-4 text-xl font-bold text-foreground">Create Report</h1>
+      <h1 className="mb-4 text-xl font-bold text-foreground">{t("create.title")}</h1>
 
       {/* Step indicator */}
       <div className="mb-6 flex items-center gap-2" role="progressbar" aria-valuenow={step + 1} aria-valuemin={1} aria-valuemax={4}>
-        {STEPS.map((s, i) => (
+        {steps.map((s, i) => (
           <div key={s} className="flex items-center gap-2">
             <div
               className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
@@ -232,16 +234,16 @@ export default function CreateReportPage() {
       {step === 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Basic Information</CardTitle>
+            <CardTitle className="text-base">{t("create.basicInfoTitle")}</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             <div>
               <label htmlFor="title" className="mb-1 block text-sm font-medium text-foreground">
-                Title *
+                {t("create.fields.title")} *
               </label>
               <Input
                 id="title"
-                placeholder="e.g. Lubang besar di Jalan Ampang"
+                placeholder={t("create.placeholders.title")}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 maxLength={100}
@@ -250,11 +252,11 @@ export default function CreateReportPage() {
             </div>
             <div>
               <label htmlFor="description" className="mb-1 block text-sm font-medium text-foreground">
-                Description *
+                {t("create.fields.description")} *
               </label>
               <Textarea
                 id="description"
-                placeholder="Describe the issue in detail..."
+                placeholder={t("create.placeholders.description")}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 maxLength={1000}
@@ -264,16 +266,16 @@ export default function CreateReportPage() {
             </div>
             <div>
               <label htmlFor="category" className="mb-1 block text-sm font-medium text-foreground">
-                Category *
+                {t("create.fields.category")} *
               </label>
               <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger id="category">
-                  <SelectValue placeholder="Select a category" />
+                  <SelectValue placeholder={t("create.placeholders.category")} />
                 </SelectTrigger>
                 <SelectContent>
-                  {(Object.keys(CATEGORY_LABELS) as ReportCategory[]).map((cat) => (
+                  {(REPORT_CATEGORIES as ReportCategory[]).map((cat) => (
                     <SelectItem key={cat} value={cat}>
-                      {CATEGORY_LABELS[cat]}
+                      {t(`categories.${cat}`)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -287,7 +289,7 @@ export default function CreateReportPage() {
       {step === 1 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Photos (Optional)</CardTitle>
+            <CardTitle className="text-base">{t("create.photosTitle")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="mb-4 grid grid-cols-3 gap-2 sm:grid-cols-5">
@@ -307,7 +309,7 @@ export default function CreateReportPage() {
               {photoFiles.length < 5 && (
                 <label className="flex aspect-square cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-border text-muted-foreground hover:border-primary hover:text-primary">
                   <Upload className="h-5 w-5" />
-                  <span className="mt-1 text-xs">Add</span>
+                  <span className="mt-1 text-xs">{t("actions.add")}</span>
                   <input
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
@@ -318,7 +320,7 @@ export default function CreateReportPage() {
                 </label>
               )}
             </div>
-            <p className="text-xs text-muted-foreground">Max 5 photos, 5MB each. JPEG, PNG or WebP.</p>
+            <p className="text-xs text-muted-foreground">{t("create.photosHint")}</p>
           </CardContent>
         </Card>
       )}
@@ -327,12 +329,12 @@ export default function CreateReportPage() {
       {step === 2 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Location</CardTitle>
+            <CardTitle className="text-base">{t("create.locationTitle")}</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             <Button variant="outline" size="sm" onClick={detectLocation} disabled={locating} className="w-fit gap-1.5 bg-transparent">
               {locating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Navigation className="h-4 w-4" />}
-              {locating ? "Detecting..." : "Auto-detect my location"}
+              {locating ? t("create.detecting") : t("create.autoDetect")}
             </Button>
 
             <div className="h-56 overflow-hidden rounded-lg border border-border">
@@ -340,27 +342,27 @@ export default function CreateReportPage() {
             </div>
             <p className="text-xs text-muted-foreground">
               <MapPin className="mr-1 inline h-3 w-3" />
-              Click or drag the marker to set the exact location. ({latitude.toFixed(4)}, {longitude.toFixed(4)})
+              {t("create.locationHint", { lat: latitude.toFixed(4), lng: longitude.toFixed(4) })}
             </p>
 
             <div>
               <label htmlFor="address" className="mb-1 block text-sm font-medium text-foreground">
-                Address / Landmark
+                {t("create.fields.address")}
               </label>
               <Input
                 id="address"
-                placeholder="e.g. Jalan Ampang, near KLCC"
+                placeholder={t("create.placeholders.address")}
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
               />
             </div>
             <div>
               <label htmlFor="landmark" className="mb-1 block text-sm font-medium text-foreground">
-                Nearby Landmark
+                {t("create.fields.landmark")}
               </label>
               <Input
                 id="landmark"
-                placeholder="e.g. opposite Suria KLCC"
+                placeholder={t("create.placeholders.landmark")}
                 value={landmark}
                 onChange={(e) => setLandmark(e.target.value)}
               />
@@ -377,7 +379,7 @@ export default function CreateReportPage() {
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <AlertTriangle className="h-4 w-4 text-status-acknowledged" />
-                  <span className="text-sm font-semibold text-foreground">Possible duplicates found nearby</span>
+                  <span className="text-sm font-semibold text-foreground">{t("create.duplicatesTitle")}</span>
                 </div>
                 <div className="flex flex-col gap-2">
                   {duplicates.map((d) => (
@@ -387,13 +389,13 @@ export default function CreateReportPage() {
                         <div className="flex items-center gap-2 mt-0.5">
                           <StatusBadge status={d.status} />
                           <span className="text-xs text-muted-foreground">
-                            {getDistanceKm(latitude, longitude, d.latitude, d.longitude).toFixed(1)} km away
+                            {t("create.kmAway", { distance: getDistanceKm(latitude, longitude, d.latitude, d.longitude).toFixed(1) })}
                           </span>
                         </div>
                       </div>
                       <Link href={`/report/${d.id}`}>
                         <Button variant="outline" size="sm" className="text-xs bg-transparent">
-                          View
+                          {t("actions.view")}
                         </Button>
                       </Link>
                     </div>
@@ -405,27 +407,27 @@ export default function CreateReportPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Review Your Report</CardTitle>
+              <CardTitle className="text-base">{t("create.reviewTitle")}</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-3">
               <div>
-                <span className="text-xs font-medium text-muted-foreground">Title</span>
+                <span className="text-xs font-medium text-muted-foreground">{t("create.fields.title")}</span>
                 <p className="text-sm font-medium text-foreground">{title}</p>
               </div>
               <div>
-                <span className="text-xs font-medium text-muted-foreground">Description</span>
+                <span className="text-xs font-medium text-muted-foreground">{t("create.fields.description")}</span>
                 <p className="text-sm text-foreground">{description}</p>
               </div>
               <div>
-                <span className="text-xs font-medium text-muted-foreground">Category</span>
-                <p className="text-sm text-foreground">{category && CATEGORY_LABELS[category as ReportCategory]}</p>
+                <span className="text-xs font-medium text-muted-foreground">{t("create.fields.category")}</span>
+                <p className="text-sm text-foreground">{category && t(`categories.${category as ReportCategory}`)}</p>
               </div>
               <div>
-                <span className="text-xs font-medium text-muted-foreground">Photos</span>
-                <p className="text-sm text-foreground">{photoFiles.length} photo(s)</p>
+                <span className="text-xs font-medium text-muted-foreground">{t("create.fields.photos")}</span>
+                <p className="text-sm text-foreground">{t("create.photoCount", { count: photoFiles.length })}</p>
               </div>
               <div>
-                <span className="text-xs font-medium text-muted-foreground">Location</span>
+                <span className="text-xs font-medium text-muted-foreground">{t("create.fields.location")}</span>
                 <p className="text-sm text-foreground">{address || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`}</p>
               </div>
             </CardContent>
@@ -437,18 +439,18 @@ export default function CreateReportPage() {
       <div className="mt-6 flex items-center justify-between">
         <Button variant="outline" onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0}>
           <ArrowLeft className="mr-1.5 h-4 w-4" />
-          Previous
+          {t("actions.previous")}
         </Button>
 
         {step < 3 ? (
           <Button onClick={() => setStep(step + 1)} disabled={!canNext()}>
-            Next
+            {t("actions.next")}
             <ArrowRight className="ml-1.5 h-4 w-4" />
           </Button>
         ) : (
           <Button onClick={handleSubmit} disabled={submitting}>
             {submitting ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-1.5 h-4 w-4" />}
-            Submit Report
+            {t("create.submit")}
           </Button>
         )}
       </div>

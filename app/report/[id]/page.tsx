@@ -29,11 +29,13 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 import { ReportMap } from "@/components/report-map"
+import { useTranslations } from "next-intl"
 
 export default function ReportDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const router = useRouter()
   const { user } = useStore()
+  const t = useTranslations()
   const report = MOCK_REPORTS.find((r) => r.id === id)
   const comments = MOCK_COMMENTS.filter((c) => c.reportId === id && !c.parentId)
   const allComments = MOCK_COMMENTS.filter((c) => c.reportId === id)
@@ -47,9 +49,9 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
   if (!report) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center">
-        <p className="text-lg font-medium text-foreground">Report not found</p>
+        <p className="text-lg font-medium text-foreground">{t("report.notFound")}</p>
         <Button variant="ghost" onClick={() => router.push("/")} className="mt-2">
-          Go back to feed
+          {t("actions.backToFeed")}
         </Button>
       </div>
     )
@@ -60,12 +62,12 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
   const handleUpvote = () => {
     setHasUpvoted(!hasUpvoted)
     setUpvoteCount((c) => (hasUpvoted ? c - 1 : c + 1))
-    toast.success(hasUpvoted ? "Upvote removed" : "Report upvoted!")
+    toast.success(hasUpvoted ? t("report.upvoteRemoved") : t("report.upvoted"))
   }
 
   const handleFollow = () => {
     setIsFollowing(!isFollowing)
-    toast.success(isFollowing ? "Unfollowed report" : "Following report!")
+    toast.success(isFollowing ? t("report.unfollowed") : t("report.following"))
   }
 
   const handleShare = async () => {
@@ -74,18 +76,18 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
       await navigator.share({ title: report.title, url })
     } else {
       await navigator.clipboard.writeText(url)
-      toast.success("Link copied to clipboard!")
+      toast.success(t("report.linkCopied"))
     }
   }
 
   const handleComment = () => {
     if (!commentText.trim()) return
-    toast.success("Comment posted!")
+    toast.success(t("report.commentPosted"))
     setCommentText("")
   }
 
   const handleFlag = () => {
-    toast.success("Report flagged. Thank you for helping keep the community safe.")
+    toast.success(t("report.flagged"))
   }
 
   const displayedComments = showAllComments ? comments : comments.slice(0, 3)
@@ -95,7 +97,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
       {/* Back button */}
       <Button variant="ghost" size="sm" onClick={() => router.back()} className="mb-3 gap-1.5 text-muted-foreground">
         <ArrowLeft className="h-4 w-4" />
-        Back
+        {t("actions.back")}
       </Button>
 
       {/* Header */}
@@ -110,7 +112,9 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
             <>
               <BoringAvatar seed={creator.avatarSeed} size={24} />
               <span className="text-sm font-medium text-foreground">{creator.name}</span>
-              <span className="text-xs text-muted-foreground">{formatPoints(creator.points)} pts</span>
+              <span className="text-xs text-muted-foreground">
+                {formatPoints(creator.points)} {t("common.pointsShort")}
+              </span>
             </>
           )}
           <span className="text-xs text-muted-foreground">
@@ -131,7 +135,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
         <CardContent className="p-4">
           <h2 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-foreground">
             <MapPin className="h-4 w-4 text-primary" />
-            Location
+            {t("report.location")}
           </h2>
           {report.address && <p className="mb-1 text-sm text-muted-foreground">{report.address}</p>}
           {report.landmark && <p className="mb-3 text-xs text-muted-foreground">{report.landmark}</p>}
@@ -151,7 +155,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
               className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
             >
               <Navigation className="h-3 w-3" />
-              Get Directions
+              {t("report.getDirections")}
             </a>
           </div>
         </CardContent>
@@ -166,7 +170,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
           className="gap-1.5"
         >
           <ThumbsUp className="h-4 w-4" />
-          Upvote ({upvoteCount})
+          {t("report.upvote", { count: upvoteCount })}
         </Button>
         <Button
           variant={isFollowing ? "default" : "outline"}
@@ -175,15 +179,15 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
           className="gap-1.5"
         >
           {isFollowing ? <UserMinus className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />}
-          {isFollowing ? "Following" : "Follow"}
+          {isFollowing ? t("report.followingButton") : t("report.follow")}
         </Button>
         <Button variant="outline" size="sm" onClick={handleShare} className="gap-1.5 bg-transparent">
           <Share2 className="h-4 w-4" />
-          Share
+          {t("actions.share")}
         </Button>
         <Button variant="ghost" size="sm" onClick={handleFlag} className="gap-1.5 text-muted-foreground">
           <Flag className="h-4 w-4" />
-          Flag
+          {t("actions.flag")}
         </Button>
       </div>
 
@@ -192,14 +196,14 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
         <CardContent className="p-4">
           <h2 className="mb-4 flex items-center gap-1.5 text-sm font-semibold text-foreground">
             <MessageCircle className="h-4 w-4 text-primary" />
-            Comments ({allComments.length})
+            {t("report.commentsTitle", { count: allComments.length })}
           </h2>
 
           {/* Comment input */}
           {!report.commentsLocked ? (
             <div className="mb-4 flex gap-2">
               <Textarea
-                placeholder="Write a comment..."
+                placeholder={t("report.commentPlaceholder")}
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
                 className="min-h-[60px] text-sm"
@@ -211,7 +215,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
             </div>
           ) : (
             <p className="mb-4 rounded-md bg-muted p-3 text-center text-xs text-muted-foreground">
-              Comments are locked on this report.
+              {t("report.commentsLocked")}
             </p>
           )}
 
@@ -276,11 +280,11 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
             >
               {showAllComments ? (
                 <>
-                  Show less <ChevronUp className="h-3 w-3" />
+                  {t("actions.showLess")} <ChevronUp className="h-3 w-3" />
                 </>
               ) : (
                 <>
-                  Show all {comments.length} comments <ChevronDown className="h-3 w-3" />
+                  {t("actions.showAllComments", { count: comments.length })} <ChevronDown className="h-3 w-3" />
                 </>
               )}
             </Button>

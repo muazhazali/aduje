@@ -6,20 +6,22 @@ import { cn } from "@/lib/utils"
 import { useStore } from "@/lib/store"
 import { BoringAvatar } from "./boring-avatar"
 import { Home, Map, PlusCircle, Bell, Trophy, Shield, Search } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Button } from "@govtechmy/myds-react/button"
+import { Input } from "@govtechmy/myds-react/input"
 import { useState } from "react"
-
-const DESKTOP_NAV = [
-  { href: "/", icon: Home, label: "Feed" },
-  { href: "/map", icon: Map, label: "Map" },
-  { href: "/leaderboard", icon: Trophy, label: "Leaderboard" },
-]
+import { useTranslations } from "next-intl"
 
 export function Header() {
   const pathname = usePathname()
   const { user, isAuthenticated, unreadCount } = useStore()
   const [searchOpen, setSearchOpen] = useState(false)
+  const t = useTranslations()
+
+  const desktopNav = [
+    { href: "/", icon: Home, label: t("nav.feed") },
+    { href: "/map", icon: Map, label: t("nav.map") },
+    { href: "/leaderboard", icon: Trophy, label: t("nav.leaderboard") },
+  ]
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-card" role="banner">
@@ -33,8 +35,8 @@ export function Header() {
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden items-center gap-1 md:flex" aria-label="Desktop navigation">
-          {DESKTOP_NAV.map((item) => {
+        <nav className="hidden items-center gap-1 md:flex" aria-label={t("nav.desktopAria")}>
+          {desktopNav.map((item) => {
             const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href)
             return (
               <Link
@@ -57,28 +59,38 @@ export function Header() {
           {searchOpen ? (
             <Input
               type="search"
-              placeholder="Search reports..."
+              placeholder={t("search.placeholder")}
               className="max-w-xs"
               autoFocus
               onBlur={() => setSearchOpen(false)}
             />
           ) : (
-            <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)} aria-label="Search">
+            <Button
+              variant="default-ghost"
+              size="small"
+              onClick={() => setSearchOpen(true)}
+              aria-label={t("actions.search")}
+            >
               <Search className="h-4 w-4" />
             </Button>
           )}
 
           {/* Create */}
           <Link href="/create">
-            <Button size="sm" className="hidden gap-1.5 md:flex">
+            <Button variant="primary-fill" size="small" className="hidden gap-1.5 md:flex">
               <PlusCircle className="h-4 w-4" />
-              Report
+              {t("nav.report")}
             </Button>
           </Link>
 
           {/* Notifications */}
           <Link href="/notifications">
-            <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
+            <Button
+              variant="default-ghost"
+              size="small"
+              className="relative"
+              aria-label={t("nav.notifications")}
+            >
               <Bell className="h-4 w-4" />
               {unreadCount > 0 && (
                 <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
@@ -91,7 +103,7 @@ export function Header() {
           {/* Admin */}
           {user?.isAdmin && (
             <Link href="/admin">
-              <Button variant="ghost" size="icon" aria-label="Admin dashboard">
+              <Button variant="default-ghost" size="small" aria-label={t("nav.admin")}>
                 <Shield className="h-4 w-4" />
               </Button>
             </Link>
@@ -104,8 +116,8 @@ export function Header() {
             </Link>
           ) : (
             <Link href="/login">
-              <Button variant="outline" size="sm">
-                Sign In
+              <Button variant="default-outline" size="small">
+                {t("actions.signIn")}
               </Button>
             </Link>
           )}

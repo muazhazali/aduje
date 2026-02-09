@@ -5,23 +5,29 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Home, Map, PlusCircle, Bell, User } from "lucide-react"
 import { useStore } from "@/lib/store"
-
-const NAV_ITEMS = [
-  { href: "/", icon: Home, label: "Feed" },
-  { href: "/map", icon: Map, label: "Map" },
-  { href: "/create", icon: PlusCircle, label: "Report" },
-  { href: "/notifications", icon: Bell, label: "Alerts" },
-  { href: "/profile", icon: User, label: "Profile" },
-]
+import { useTranslations } from "next-intl"
 
 export function BottomNav() {
   const pathname = usePathname()
   const unreadCount = useStore((s) => s.unreadCount)
+  const t = useTranslations()
+
+  const navItems = [
+    { href: "/", icon: Home, label: t("nav.feed") },
+    { href: "/map", icon: Map, label: t("nav.map") },
+    { href: "/create", icon: PlusCircle, label: t("nav.report") },
+    { href: "/notifications", icon: Bell, label: t("nav.alerts") },
+    { href: "/profile", icon: User, label: t("nav.profile") },
+  ]
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-card md:hidden" role="navigation" aria-label="Main navigation">
+    <nav
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-card md:hidden"
+      role="navigation"
+      aria-label={t("nav.mainAria")}
+    >
       <div className="flex items-center justify-around">
-        {NAV_ITEMS.map((item) => {
+        {navItems.map((item) => {
           const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href)
           const Icon = item.icon
 

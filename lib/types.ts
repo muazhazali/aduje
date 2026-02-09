@@ -12,17 +12,32 @@ export type ReportCategory =
   | "bunyi_bising"
   | "lain_lain"
 
+export const REPORT_CATEGORIES: ReportCategory[] = [
+  "jalan_raya",
+  "lampu_jalan",
+  "sampah_sarap",
+  "longkang_tersumbat",
+  "vandalisme",
+  "taman_landskap",
+  "kemudahan_awam",
+  "haiwan_terbiar",
+  "bunyi_bising",
+  "lain_lain",
+]
+
+export const REPORT_STATUSES: ReportStatus[] = ["draft", "open", "acknowledged", "in_progress", "closed"]
+
 export const CATEGORY_LABELS: Record<ReportCategory, string> = {
-  jalan_raya: "Jalan Raya (Potholes)",
-  lampu_jalan: "Lampu Jalan (Streetlights)",
-  sampah_sarap: "Sampah Sarap (Garbage)",
-  longkang_tersumbat: "Longkang Tersumbat (Drains)",
-  vandalisme: "Vandalisme (Vandalism)",
-  taman_landskap: "Taman & Landskap (Parks)",
-  kemudahan_awam: "Kemudahan Awam (Facilities)",
-  haiwan_terbiar: "Haiwan Terbiar (Stray Animals)",
-  bunyi_bising: "Bunyi Bising (Noise)",
-  lain_lain: "Lain-lain (Others)",
+  jalan_raya: "Jalan Raya",
+  lampu_jalan: "Lampu Jalan",
+  sampah_sarap: "Sampah Sarap",
+  longkang_tersumbat: "Longkang Tersumbat",
+  vandalisme: "Vandalisme",
+  taman_landskap: "Taman & Landskap",
+  kemudahan_awam: "Kemudahan Awam",
+  haiwan_terbiar: "Haiwan Terbiar",
+  bunyi_bising: "Bunyi Bising",
+  lain_lain: "Lain-lain",
 }
 
 export const CATEGORY_ICONS: Record<ReportCategory, string> = {
@@ -39,11 +54,11 @@ export const CATEGORY_ICONS: Record<ReportCategory, string> = {
 }
 
 export const STATUS_LABELS: Record<ReportStatus, string> = {
-  draft: "Draft",
-  open: "Open",
-  acknowledged: "Acknowledged",
-  in_progress: "In Progress",
-  closed: "Closed",
+  draft: "Draf",
+  open: "Terbuka",
+  acknowledged: "Diakui",
+  in_progress: "Dalam Proses",
+  closed: "Selesai",
 }
 
 export interface User {

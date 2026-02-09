@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Bell, ThumbsUp, MessageCircle, Award, AlertTriangle, CheckCheck } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 
 const NOTIF_ICONS: Record<string, React.ElementType> = {
   upvote: ThumbsUp,
@@ -20,18 +21,19 @@ const NOTIF_ICONS: Record<string, React.ElementType> = {
 
 export default function NotificationsPage() {
   const { notifications, markAsRead, markAllAsRead, unreadCount } = useStore()
+  const t = useTranslations()
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-6">
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
           <Bell className="h-5 w-5 text-primary" />
-          Notifications
+          {t("notifications.title")}
         </h1>
         {unreadCount > 0 && (
           <Button variant="ghost" size="sm" onClick={markAllAsRead} className="gap-1.5 text-xs text-muted-foreground">
             <CheckCheck className="h-4 w-4" />
-            Mark all read
+            {t("notifications.markAllRead")}
           </Button>
         )}
       </div>
@@ -39,7 +41,7 @@ export default function NotificationsPage() {
       {notifications.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16">
           <Bell className="h-12 w-12 text-muted-foreground" />
-          <p className="mt-3 text-sm text-muted-foreground">No notifications yet</p>
+          <p className="mt-3 text-sm text-muted-foreground">{t("notifications.empty")}</p>
         </div>
       ) : (
         <div className="flex flex-col gap-2">

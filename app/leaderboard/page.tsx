@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Trophy, Medal, Award, Target, Handshake, Star } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useTranslations } from "next-intl"
 
 const BADGE_ICONS: Record<string, React.ElementType> = {
   pemula: Target,
@@ -27,19 +28,20 @@ const RANK_ICONS = [Trophy, Medal, Award]
 
 export default function LeaderboardPage() {
   const { user } = useStore()
+  const t = useTranslations()
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6">
       <h1 className="mb-4 text-xl font-bold text-foreground flex items-center gap-2">
         <Trophy className="h-6 w-6 text-secondary" />
-        Leaderboard
+        {t("leaderboard.title")}
       </h1>
 
       <Tabs defaultValue="all-time">
         <TabsList>
-          <TabsTrigger value="all-time">All Time</TabsTrigger>
-          <TabsTrigger value="monthly">This Month</TabsTrigger>
-          <TabsTrigger value="weekly">This Week</TabsTrigger>
+          <TabsTrigger value="all-time">{t("leaderboard.allTime")}</TabsTrigger>
+          <TabsTrigger value="monthly">{t("leaderboard.thisMonth")}</TabsTrigger>
+          <TabsTrigger value="weekly">{t("leaderboard.thisWeek")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all-time" className="mt-4">
@@ -54,7 +56,7 @@ export default function LeaderboardPage() {
                     <BoringAvatar seed={u.avatarSeed} size={i === 0 ? 56 : 44} />
                     <p className="mt-2 text-sm font-semibold text-foreground truncate">{u.name}</p>
                     <p className="text-lg font-bold text-primary">{formatPoints(u.points)}</p>
-                    <p className="text-xs text-muted-foreground">points</p>
+                    <p className="text-xs text-muted-foreground">{t("common.points")}</p>
                     <div className="mt-2 flex items-center justify-center gap-1">
                       {u.badges.map((b) => {
                         const Icon = BADGE_ICONS[b]
@@ -70,7 +72,7 @@ export default function LeaderboardPage() {
           {/* Full list */}
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-semibold">All Rankings</CardTitle>
+              <CardTitle className="text-sm font-semibold">{t("leaderboard.allRankings")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col">
@@ -91,7 +93,7 @@ export default function LeaderboardPage() {
                       <div className="flex-1 min-w-0">
                         <p className={cn("text-sm truncate", isCurrentUser ? "font-bold text-primary" : "font-medium text-foreground")}>
                           {u.name}
-                          {isCurrentUser && <span className="ml-1 text-xs">(You)</span>}
+                          {isCurrentUser && <span className="ml-1 text-xs">({t("leaderboard.you")})</span>}
                         </p>
                         <div className="flex items-center gap-1">
                           {u.badges.map((b) => {
@@ -100,7 +102,9 @@ export default function LeaderboardPage() {
                           })}
                         </div>
                       </div>
-                      <span className="text-sm font-bold text-primary">{formatPoints(u.points)} pts</span>
+                      <span className="text-sm font-bold text-primary">
+                        {formatPoints(u.points)} {t("common.pointsShort")}
+                      </span>
                     </div>
                   )
                 })}
@@ -110,10 +114,10 @@ export default function LeaderboardPage() {
         </TabsContent>
 
         <TabsContent value="monthly" className="mt-4">
-          <p className="py-12 text-center text-sm text-muted-foreground">Monthly leaderboard coming soon</p>
+          <p className="py-12 text-center text-sm text-muted-foreground">{t("leaderboard.monthlySoon")}</p>
         </TabsContent>
         <TabsContent value="weekly" className="mt-4">
-          <p className="py-12 text-center text-sm text-muted-foreground">Weekly leaderboard coming soon</p>
+          <p className="py-12 text-center text-sm text-muted-foreground">{t("leaderboard.weeklySoon")}</p>
         </TabsContent>
       </Tabs>
     </div>

@@ -31,11 +31,11 @@ export function formatRelativeTime(dateString: string): string {
   const diffHour = Math.floor(diffMin / 60)
   const diffDay = Math.floor(diffHour / 24)
 
-  if (diffSec < 60) return "just now"
-  if (diffMin < 60) return `${diffMin}m ago`
-  if (diffHour < 24) return `${diffHour}h ago`
-  if (diffDay < 7) return `${diffDay}d ago`
-  return date.toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" })
+  if (diffSec < 60) return "baru sahaja"
+  if (diffMin < 60) return `${diffMin} min lalu`
+  if (diffHour < 24) return `${diffHour} jam lalu`
+  if (diffDay < 7) return `${diffDay} hari lalu`
+  return date.toLocaleDateString("ms-MY", { day: "numeric", month: "short", year: "numeric" })
 }
 
 export function formatPoints(points: number): string {

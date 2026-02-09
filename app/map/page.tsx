@@ -1,11 +1,12 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { MOCK_REPORTS } from "@/lib/mock-data"
-import { STATUS_LABELS, CATEGORY_LABELS, type ReportStatus } from "@/lib/types"
+import { REPORT_STATUSES, type ReportCategory, type ReportStatus } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { List } from "lucide-react"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 
 const STATUS_MARKER_COLORS: Record<ReportStatus, string> = {
   draft: "#6B7280",
@@ -19,6 +20,10 @@ export default function MapPage() {
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<unknown>(null)
   const [loaded, setLoaded] = useState(false)
+  const t = useTranslations()
+
+  const getCategoryLabel = useCallback((category: ReportCategory) => t(`categories.${category}`), [t])
+  const getStatusLabel = useCallback((status: ReportStatus) => t(`status.${status}`), [t])
 
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return
@@ -47,6 +52,8 @@ export default function MapPage() {
 
       for (const report of reports) {
         const color = STATUS_MARKER_COLORS[report.status]
+        const categoryLabel = getCategoryLabel(report.category)
+        const statusLabel = getStatusLabel(report.status)
         const icon = L.divIcon({
           className: "",
           html: `<div style="width:24px;height:24px;border-radius:50%;background:${color};border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>`,
@@ -59,9 +66,9 @@ export default function MapPage() {
           .bindPopup(
             `<div style="min-width:200px">
               <strong style="font-size:13px">${report.title}</strong><br/>
-              <span style="font-size:11px;color:#666">${CATEGORY_LABELS[report.category]}</span><br/>
-              <span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;color:white;background:${color};margin-top:4px">${STATUS_LABELS[report.status]}</span><br/>
-              <a href="/report/${report.id}" style="font-size:11px;color:#CC0001;margin-top:6px;display:inline-block">View Details &rarr;</a>
+              <span style="font-size:11px;color:#666">${categoryLabel}</span><br/>
+              <span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;color:white;background:${color};margin-top:4px">${statusLabel}</span><br/>
+              <a href="/report/${report.id}" style="font-size:11px;color:#CC0001;margin-top:6px;display:inline-block">${t("map.viewDetails")} &rarr;</a>
             </div>`,
           )
       }
@@ -80,7 +87,7 @@ export default function MapPage() {
         mapInstanceRef.current = null
       }
     }
-  }, [])
+  }, [getCategoryLabel, getStatusLabel, t])
 
   return (
     <div className="relative" style={{ height: "calc(100vh - 3.5rem - 4rem)" }}>
@@ -91,22 +98,22 @@ export default function MapPage() {
         <Link href="/">
           <Button size="sm" className="gap-1.5 shadow-md">
             <List className="h-4 w-4" />
-            List View
+            {t("map.listView")}
           </Button>
         </Link>
       </div>
 
       {/* Legend */}
       <div className="absolute bottom-4 left-4 z-10 rounded-lg bg-card p-3 shadow-md">
-        <p className="mb-1.5 text-xs font-semibold text-foreground">Status Legend</p>
+        <p className="mb-1.5 text-xs font-semibold text-foreground">{t("map.statusLegend")}</p>
         <div className="flex flex-col gap-1">
-          {(["open", "acknowledged", "in_progress", "closed"] as ReportStatus[]).map((status) => (
+          {(REPORT_STATUSES as ReportStatus[]).filter((status) => status !== "draft").map((status) => (
             <div key={status} className="flex items-center gap-2">
               <span
                 className="h-3 w-3 rounded-full"
                 style={{ backgroundColor: STATUS_MARKER_COLORS[status] }}
               />
-              <span className="text-xs text-muted-foreground">{STATUS_LABELS[status]}</span>
+              <span className="text-xs text-muted-foreground">{getStatusLabel(status)}</span>
             </div>
           ))}
         </div>
@@ -114,7 +121,7 @@ export default function MapPage() {
 
       {!loaded && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-muted">
-          <p className="text-sm text-muted-foreground">Loading map...</p>
+          <p className="text-sm text-muted-foreground">{t("map.loading")}</p>
         </div>
       )}
     </div>

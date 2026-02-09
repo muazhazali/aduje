@@ -1,0 +1,254 @@
+{
+  "nav": {
+    "feed": "Feed",
+    "map": "Map",
+    "leaderboard": "Leaderboard",
+    "report": "Report",
+    "alerts": "Alerts",
+    "profile": "Profile",
+    "notifications": "Notifications",
+    "admin": "Admin",
+    "desktopAria": "Desktop navigation",
+    "mainAria": "Main navigation"
+  },
+  "search": {
+    "placeholder": "Search reports..."
+  },
+  "actions": {
+    "search": "Search",
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "clear": "Clear",
+    "add": "Add",
+    "view": "View",
+    "back": "Back",
+    "previous": "Previous",
+    "next": "Next",
+    "share": "Share",
+    "flag": "Flag",
+    "showLess": "Show less",
+    "showAllComments": "Show all {count} comments",
+    "backToFeed": "Go back to feed"
+  },
+  "feed": {
+    "heroTitle": "Report Local Issues in Your Community",
+    "heroSubtitle": "Help improve Malaysia, one report at a time. Jom buat laporan!",
+    "emptyTitle": "No reports found",
+    "emptySubtitle": "Try adjusting your filters or search term"
+  },
+  "filters": {
+    "category": "Category",
+    "status": "Status",
+    "sortBy": "Sort by",
+    "allCategories": "All Categories",
+    "allStatuses": "All Statuses",
+    "mostRecent": "Most Recent",
+    "mostUpvoted": "Most Upvoted"
+  },
+  "leaderboard": {
+    "topCommunity": "Top Community Members",
+    "viewFull": "View Full Leaderboard",
+    "title": "Leaderboard",
+    "allTime": "All Time",
+    "thisMonth": "This Month",
+    "thisWeek": "This Week",
+    "allRankings": "All Rankings",
+    "you": "You",
+    "monthlySoon": "Monthly leaderboard coming soon",
+    "weeklySoon": "Weekly leaderboard coming soon"
+  },
+  "common": {
+    "points": "points",
+    "pointsShort": "pts"
+  },
+  "auth": {
+    "pleaseSignIn": "Please sign in",
+    "signedInAs": "Signed in as {name}",
+    "welcomeTitle": "Welcome to ReporterMY",
+    "welcomeSubtitle": "Sign in to report issues in your community",
+    "signInWithGoogle": "Sign in with Google",
+    "demoAccounts": "Demo accounts",
+    "admin": "Admin",
+    "user": "User",
+    "loggedOut": "Logged out"
+  },
+  "profile": {
+    "joined": "Joined",
+    "badges": "Badges",
+    "noBadges": "No badges yet. Start reporting to earn badges!",
+    "publicProfile": "Public profile",
+    "privateToast": "Profile set to private",
+    "publicToast": "Profile set to public",
+    "reports": "Reports",
+    "following": "Following",
+    "myReports": "My Reports ({count})",
+    "followedReports": "Following ({count})",
+    "noReports": "No reports yet",
+    "noFollowing": "Not following any reports"
+  },
+  "badges": {
+    "pemula": {
+      "name": "Pemula",
+      "description": "Started making a difference in your community"
+    },
+    "penolong": {
+      "name": "Penolong",
+      "description": "Actively engaged in community discussions"
+    },
+    "penyelesai": {
+      "name": "Penyelesai",
+      "description": "Got issues resolved for the community"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all read",
+    "empty": "No notifications yet"
+  },
+  "map": {
+    "viewDetails": "View Details",
+    "listView": "List View",
+    "statusLegend": "Status Legend",
+    "loading": "Loading map..."
+  },
+  "create": {
+    "geoNotSupported": "Geolocation not supported by your browser",
+    "locationDetected": "Location detected!",
+    "locationFailed": "Unable to get location. Using default KL location.",
+    "maxPhotos": "Maximum 5 photos allowed",
+    "photoTooLarge": "Some files were too large (max 5MB)",
+    "submitted": "Report submitted! +10 points",
+    "steps": {
+      "basic": "Basic Info",
+      "photos": "Photos",
+      "location": "Location",
+      "review": "Review"
+    },
+    "title": "Create Report",
+    "basicInfoTitle": "Basic Information",
+    "fields": {
+      "title": "Title",
+      "description": "Description",
+      "category": "Category",
+      "address": "Address / Landmark",
+      "landmark": "Nearby Landmark",
+      "photos": "Photos",
+      "location": "Location"
+    },
+    "placeholders": {
+      "title": "e.g. Lubang besar di Jalan Ampang",
+      "description": "Describe the issue in detail...",
+      "category": "Select a category",
+      "address": "e.g. Jalan Ampang, near KLCC",
+      "landmark": "e.g. opposite Suria KLCC"
+    },
+    "photosTitle": "Photos (Optional)",
+    "photosHint": "Max 5 photos, 5MB each. JPEG, PNG or WebP.",
+    "locationTitle": "Location",
+    "detecting": "Detecting...",
+    "autoDetect": "Auto-detect my location",
+    "locationHint": "Click or drag the marker to set the exact location. ({lat}, {lng})",
+    "duplicatesTitle": "Possible duplicates found nearby",
+    "kmAway": "{distance} km away",
+    "reviewTitle": "Review Your Report",
+    "photoCount": "{count} photo(s)",
+    "submit": "Submit Report"
+  },
+  "report": {
+    "notFound": "Report not found",
+    "upvoteRemoved": "Upvote removed",
+    "upvoted": "Report upvoted!",
+    "unfollowed": "Unfollowed report",
+    "following": "Following report!",
+    "linkCopied": "Link copied to clipboard!",
+    "commentPosted": "Comment posted!",
+    "flagged": "Report flagged. Thank you for helping keep the community safe.",
+    "location": "Location",
+    "getDirections": "Get Directions",
+    "upvote": "Upvote ({count})",
+    "followingButton": "Following",
+    "follow": "Follow",
+    "commentsTitle": "Comments ({count})",
+    "commentPlaceholder": "Write a comment...",
+    "commentsLocked": "Comments are locked on this report."
+  },
+  "admin": {
+    "title": "Admin Dashboard",
+    "logs": {
+      "changedStatus": "Changed status",
+      "postedComment": "Posted comment",
+      "warnedUser": "Warned user",
+      "sampleReport1": "Report: Lubang besar di Jalan Ampang",
+      "sampleReport2": "Report: Sampah bertimbun di Pasar Chow Kit",
+      "sampleUser": "User: Ali Hassan",
+      "officialUpdate": "Official update",
+      "repeatSpam": "Repeated spam reports"
+    },
+    "toast": {
+      "statusUpdated": "Status updated to {status}",
+      "reportHidden": "Report hidden from public view",
+      "commentsLocked": "Comments locked on report",
+      "warningSent": "Warning sent to user",
+      "userBanned": "User has been banned",
+      "userUnbanned": "User has been unbanned"
+    },
+    "stats": {
+      "totalReports": "Total Reports",
+      "openIssues": "Open Issues",
+      "totalUsers": "Total Users",
+      "comments": "Comments"
+    },
+    "tabs": {
+      "reports": "Reports",
+      "flagged": "Flagged",
+      "users": "Users",
+      "audit": "Audit Logs"
+    },
+    "reports": {
+      "allReports": "All Reports"
+    },
+    "actions": {
+      "toggleVisibility": "Toggle visibility",
+      "toggleComments": "Toggle comments"
+    },
+    "flagged": {
+      "title": "Flagged Content",
+      "empty": "No flagged content",
+      "flags": "{count} flags",
+      "dismiss": "Dismiss",
+      "hide": "Hide"
+    },
+    "users": {
+      "title": "User Management",
+      "admin": "Admin",
+      "banned": "Banned",
+      "warnings": "{count} warnings",
+      "badges": "{count} badges",
+      "warn": "Warn",
+      "unban": "Unban",
+      "ban": "Ban"
+    },
+    "audit": {
+      "title": "Audit Logs"
+    }
+  },
+  "status": {
+    "draft": "Draft",
+    "open": "Open",
+    "acknowledged": "Acknowledged",
+    "in_progress": "In Progress",
+    "closed": "Closed"
+  },
+  "categories": {
+    "jalan_raya": "Jalan Raya",
+    "lampu_jalan": "Lampu Jalan",
+    "sampah_sarap": "Sampah Sarap",
+    "longkang_tersumbat": "Longkang Tersumbat",
+    "vandalisme": "Vandalisme",
+    "taman_landskap": "Taman & Landskap",
+    "kemudahan_awam": "Kemudahan Awam",
+    "haiwan_terbiar": "Haiwan Terbiar",
+    "bunyi_bising": "Bunyi Bising",
+    "lain_lain": "Lain-lain"
+  }
+}

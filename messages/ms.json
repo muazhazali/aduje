@@ -1,0 +1,254 @@
+{
+  "nav": {
+    "feed": "Suapan",
+    "map": "Peta",
+    "leaderboard": "Papan Kedudukan",
+    "report": "Lapor",
+    "alerts": "Peringatan",
+    "profile": "Profil",
+    "notifications": "Notifikasi",
+    "admin": "Admin",
+    "desktopAria": "Navigasi desktop",
+    "mainAria": "Navigasi utama"
+  },
+  "search": {
+    "placeholder": "Cari laporan..."
+  },
+  "actions": {
+    "search": "Cari",
+    "signIn": "Log masuk",
+    "signOut": "Log keluar",
+    "clear": "Kosongkan",
+    "add": "Tambah",
+    "view": "Lihat",
+    "back": "Kembali",
+    "previous": "Sebelumnya",
+    "next": "Seterusnya",
+    "share": "Kongsi",
+    "flag": "Laporkan",
+    "showLess": "Tunjuk kurang",
+    "showAllComments": "Tunjuk semua {count} komen",
+    "backToFeed": "Kembali ke suapan"
+  },
+  "feed": {
+    "heroTitle": "Lapor Isu Setempat di Komuniti Anda",
+    "heroSubtitle": "Bantu perbaiki Malaysia, satu laporan pada satu masa. Jom buat laporan!",
+    "emptyTitle": "Tiada laporan ditemui",
+    "emptySubtitle": "Cuba ubah penapis atau kata carian"
+  },
+  "filters": {
+    "category": "Kategori",
+    "status": "Status",
+    "sortBy": "Susun mengikut",
+    "allCategories": "Semua Kategori",
+    "allStatuses": "Semua Status",
+    "mostRecent": "Terkini",
+    "mostUpvoted": "Paling Disokong"
+  },
+  "leaderboard": {
+    "topCommunity": "Ahli Komuniti Teratas",
+    "viewFull": "Lihat Papan Kedudukan Penuh",
+    "title": "Papan Kedudukan",
+    "allTime": "Sepanjang Masa",
+    "thisMonth": "Bulan Ini",
+    "thisWeek": "Minggu Ini",
+    "allRankings": "Semua Kedudukan",
+    "you": "Anda",
+    "monthlySoon": "Papan kedudukan bulanan akan datang",
+    "weeklySoon": "Papan kedudukan mingguan akan datang"
+  },
+  "common": {
+    "points": "mata",
+    "pointsShort": "mata"
+  },
+  "auth": {
+    "pleaseSignIn": "Sila log masuk",
+    "signedInAs": "Log masuk sebagai {name}",
+    "welcomeTitle": "Selamat datang ke ReporterMY",
+    "welcomeSubtitle": "Log masuk untuk melapor isu di komuniti anda",
+    "signInWithGoogle": "Log masuk dengan Google",
+    "demoAccounts": "Akaun demo",
+    "admin": "Admin",
+    "user": "Pengguna",
+    "loggedOut": "Berjaya log keluar"
+  },
+  "profile": {
+    "joined": "Menyertai",
+    "badges": "Lencana",
+    "noBadges": "Belum ada lencana. Mula melapor untuk dapatkan lencana!",
+    "publicProfile": "Profil awam",
+    "privateToast": "Profil ditetapkan kepada peribadi",
+    "publicToast": "Profil ditetapkan kepada awam",
+    "reports": "Laporan",
+    "following": "Mengikuti",
+    "myReports": "Laporan Saya ({count})",
+    "followedReports": "Mengikuti ({count})",
+    "noReports": "Tiada laporan lagi",
+    "noFollowing": "Belum mengikuti mana-mana laporan"
+  },
+  "badges": {
+    "pemula": {
+      "name": "Pemula",
+      "description": "Mula membuat perubahan dalam komuniti anda"
+    },
+    "penolong": {
+      "name": "Penolong",
+      "description": "Aktif dalam perbincangan komuniti"
+    },
+    "penyelesai": {
+      "name": "Penyelesai",
+      "description": "Berjaya selesaikan isu komuniti"
+    }
+  },
+  "notifications": {
+    "title": "Notifikasi",
+    "markAllRead": "Tanda semua dibaca",
+    "empty": "Tiada notifikasi lagi"
+  },
+  "map": {
+    "viewDetails": "Lihat Butiran",
+    "listView": "Paparan Senarai",
+    "statusLegend": "Petunjuk Status",
+    "loading": "Memuatkan peta..."
+  },
+  "create": {
+    "geoNotSupported": "Geolokasi tidak disokong oleh pelayar anda",
+    "locationDetected": "Lokasi berjaya dikesan!",
+    "locationFailed": "Tidak dapat mengesan lokasi. Menggunakan lokasi KL secara lalai.",
+    "maxPhotos": "Maksimum 5 foto dibenarkan",
+    "photoTooLarge": "Ada fail terlalu besar (maks 5MB)",
+    "submitted": "Laporan dihantar! +10 mata",
+    "steps": {
+      "basic": "Maklumat Asas",
+      "photos": "Foto",
+      "location": "Lokasi",
+      "review": "Semakan"
+    },
+    "title": "Cipta Laporan",
+    "basicInfoTitle": "Maklumat Asas",
+    "fields": {
+      "title": "Tajuk",
+      "description": "Penerangan",
+      "category": "Kategori",
+      "address": "Alamat / Mercu tanda",
+      "landmark": "Mercu tanda berdekatan",
+      "photos": "Foto",
+      "location": "Lokasi"
+    },
+    "placeholders": {
+      "title": "cth. Lubang besar di Jalan Ampang",
+      "description": "Terangkan isu dengan terperinci...",
+      "category": "Pilih kategori",
+      "address": "cth. Jalan Ampang, dekat KLCC",
+      "landmark": "cth. bertentangan Suria KLCC"
+    },
+    "photosTitle": "Foto (Pilihan)",
+    "photosHint": "Maks 5 foto, 5MB setiap satu. JPEG, PNG atau WebP.",
+    "locationTitle": "Lokasi",
+    "detecting": "Mengesan...",
+    "autoDetect": "Auto-kesan lokasi saya",
+    "locationHint": "Klik atau seret penanda untuk tetapkan lokasi tepat. ({lat}, {lng})",
+    "duplicatesTitle": "Kemungkinan laporan pendua berdekatan",
+    "kmAway": "{distance} km dari sini",
+    "reviewTitle": "Semak Laporan Anda",
+    "photoCount": "{count} foto",
+    "submit": "Hantar Laporan"
+  },
+  "report": {
+    "notFound": "Laporan tidak ditemui",
+    "upvoteRemoved": "Undi naik dibuang",
+    "upvoted": "Laporan disokong!",
+    "unfollowed": "Berhenti mengikuti laporan",
+    "following": "Mengikuti laporan!",
+    "linkCopied": "Pautan disalin ke papan klip!",
+    "commentPosted": "Komen dihantar!",
+    "flagged": "Laporan telah ditandakan. Terima kasih membantu menjaga komuniti.",
+    "location": "Lokasi",
+    "getDirections": "Dapatkan Arah",
+    "upvote": "Sokong ({count})",
+    "followingButton": "Mengikuti",
+    "follow": "Ikut",
+    "commentsTitle": "Komen ({count})",
+    "commentPlaceholder": "Tulis komen...",
+    "commentsLocked": "Komen dikunci untuk laporan ini."
+  },
+  "admin": {
+    "title": "Papan Pemuka Admin",
+    "logs": {
+      "changedStatus": "Menukar status",
+      "postedComment": "Menghantar komen",
+      "warnedUser": "Memberi amaran pengguna",
+      "sampleReport1": "Laporan: Lubang besar di Jalan Ampang",
+      "sampleReport2": "Laporan: Sampah bertimbun di Pasar Chow Kit",
+      "sampleUser": "Pengguna: Ali Hassan",
+      "officialUpdate": "Kemaskini rasmi",
+      "repeatSpam": "Laporan spam berulang"
+    },
+    "toast": {
+      "statusUpdated": "Status dikemas kini kepada {status}",
+      "reportHidden": "Laporan disembunyikan daripada paparan awam",
+      "commentsLocked": "Komen dikunci untuk laporan ini",
+      "warningSent": "Amaran dihantar kepada pengguna",
+      "userBanned": "Pengguna telah disekat",
+      "userUnbanned": "Pengguna telah dinyahsekat"
+    },
+    "stats": {
+      "totalReports": "Jumlah Laporan",
+      "openIssues": "Isu Terbuka",
+      "totalUsers": "Jumlah Pengguna",
+      "comments": "Komen"
+    },
+    "tabs": {
+      "reports": "Laporan",
+      "flagged": "Ditandai",
+      "users": "Pengguna",
+      "audit": "Log Audit"
+    },
+    "reports": {
+      "allReports": "Semua Laporan"
+    },
+    "actions": {
+      "toggleVisibility": "Tukar keterlihatan",
+      "toggleComments": "Tukar komen"
+    },
+    "flagged": {
+      "title": "Kandungan Ditandai",
+      "empty": "Tiada kandungan ditandai",
+      "flags": "{count} tandaan",
+      "dismiss": "Tolak",
+      "hide": "Sembunyi"
+    },
+    "users": {
+      "title": "Pengurusan Pengguna",
+      "admin": "Admin",
+      "banned": "Disekat",
+      "warnings": "{count} amaran",
+      "badges": "{count} lencana",
+      "warn": "Amaran",
+      "unban": "Nyahsekat",
+      "ban": "Sekat"
+    },
+    "audit": {
+      "title": "Log Audit"
+    }
+  },
+  "status": {
+    "draft": "Draf",
+    "open": "Terbuka",
+    "acknowledged": "Diakui",
+    "in_progress": "Dalam Proses",
+    "closed": "Selesai"
+  },
+  "categories": {
+    "jalan_raya": "Jalan Raya",
+    "lampu_jalan": "Lampu Jalan",
+    "sampah_sarap": "Sampah Sarap",
+    "longkang_tersumbat": "Longkang Tersumbat",
+    "vandalisme": "Vandalisme",
+    "taman_landskap": "Taman & Landskap",
+    "kemudahan_awam": "Kemudahan Awam",
+    "haiwan_terbiar": "Haiwan Terbiar",
+    "bunyi_bising": "Bunyi Bising",
+    "lain_lain": "Lain-lain"
+  }
+}

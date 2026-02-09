@@ -13,35 +13,16 @@ import { Label } from "@/components/ui/label"
 import { Trophy, FileText, Eye, LogOut, Target, Handshake, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
-
-const BADGE_INFO = {
-  pemula: {
-    name: "Pemula",
-    description: "Started making a difference in your community",
-    icon: Target,
-    colors: "bg-primary/10 text-primary border-primary/20",
-  },
-  penolong: {
-    name: "Penolong",
-    description: "Actively engaged in community discussions",
-    icon: Handshake,
-    colors: "bg-status-in-progress/10 text-status-in-progress border-status-in-progress/20",
-  },
-  penyelesai: {
-    name: "Penyelesai",
-    description: "Got issues resolved for the community",
-    icon: Star,
-    colors: "bg-secondary/20 text-foreground border-secondary/30",
-  },
-}
+import { useTranslations } from "next-intl"
 
 export default function ProfilePage() {
   const { user, setUser, logout } = useStore()
+  const t = useTranslations()
 
   if (!user) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center">
-        <p className="text-lg font-medium text-foreground">Please sign in</p>
+        <p className="text-lg font-medium text-foreground">{t("auth.pleaseSignIn")}</p>
       </div>
     )
   }
@@ -49,9 +30,30 @@ export default function ProfilePage() {
   const myReports = MOCK_REPORTS.filter((r) => r.createdBy === user.id)
   const followedReports = MOCK_REPORTS.filter((r) => r.followers.includes(user.id) && r.createdBy !== user.id)
 
+  const badgeInfo = {
+    pemula: {
+      name: t("badges.pemula.name"),
+      description: t("badges.pemula.description"),
+      icon: Target,
+      colors: "bg-primary/10 text-primary border-primary/20",
+    },
+    penolong: {
+      name: t("badges.penolong.name"),
+      description: t("badges.penolong.description"),
+      icon: Handshake,
+      colors: "bg-status-in-progress/10 text-status-in-progress border-status-in-progress/20",
+    },
+    penyelesai: {
+      name: t("badges.penyelesai.name"),
+      description: t("badges.penyelesai.description"),
+      icon: Star,
+      colors: "bg-secondary/20 text-foreground border-secondary/30",
+    },
+  }
+
   const handleTogglePublic = () => {
     setUser({ ...user, isPublic: !user.isPublic })
-    toast.success(user.isPublic ? "Profile set to private" : "Profile set to public")
+    toast.success(user.isPublic ? t("profile.privateToast") : t("profile.publicToast"))
   }
 
   return (
@@ -65,22 +67,23 @@ export default function ProfilePage() {
               <h1 className="text-xl font-bold text-foreground">{user.name}</h1>
               <p className="text-sm text-muted-foreground">{user.email}</p>
               <p className="mt-1 text-xs text-muted-foreground">
-                Joined {new Date(user.created).toLocaleDateString("en-MY", { month: "long", year: "numeric" })}
+                {t("profile.joined")}{" "}
+                {new Date(user.created).toLocaleDateString("ms-MY", { month: "long", year: "numeric" })}
               </p>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-primary">{formatPoints(user.points)}</div>
-              <div className="text-xs text-muted-foreground">points</div>
+              <div className="text-xs text-muted-foreground">{t("common.points")}</div>
             </div>
           </div>
 
           {/* Badges */}
           <div className="mt-6">
-            <h3 className="mb-2 text-sm font-semibold text-foreground">Badges</h3>
+            <h3 className="mb-2 text-sm font-semibold text-foreground">{t("profile.badges")}</h3>
             <div className="flex flex-wrap gap-2">
               {user.badges.length > 0 ? (
                 user.badges.map((badge) => {
-                  const info = BADGE_INFO[badge as keyof typeof BADGE_INFO]
+                  const info = badgeInfo[badge as keyof typeof badgeInfo]
                   if (!info) return null
                   const Icon = info.icon
                   return (
@@ -97,7 +100,7 @@ export default function ProfilePage() {
                   )
                 })
               ) : (
-                <p className="text-xs text-muted-foreground">No badges yet. Start reporting to earn badges!</p>
+                <p className="text-xs text-muted-foreground">{t("profile.noBadges")}</p>
               )}
             </div>
           </div>
@@ -108,12 +111,20 @@ export default function ProfilePage() {
               <Switch id="public" checked={user.isPublic} onCheckedChange={handleTogglePublic} />
               <Label htmlFor="public" className="flex items-center gap-1 text-sm">
                 <Eye className="h-3.5 w-3.5" />
-                Public profile
+                {t("profile.publicProfile")}
               </Label>
             </div>
-            <Button variant="ghost" size="sm" onClick={() => { logout(); toast.success("Logged out") }} className="gap-1.5 text-muted-foreground">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                logout()
+                toast.success(t("auth.loggedOut"))
+              }}
+              className="gap-1.5 text-muted-foreground"
+            >
               <LogOut className="h-4 w-4" />
-              Sign out
+              {t("actions.signOut")}
             </Button>
           </div>
         </CardContent>
@@ -125,21 +136,21 @@ export default function ProfilePage() {
           <CardContent className="flex flex-col items-center p-4">
             <FileText className="h-5 w-5 text-primary" />
             <span className="mt-1 text-2xl font-bold text-foreground">{myReports.length}</span>
-            <span className="text-xs text-muted-foreground">Reports</span>
+            <span className="text-xs text-muted-foreground">{t("profile.reports")}</span>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="flex flex-col items-center p-4">
             <Eye className="h-5 w-5 text-status-in-progress" />
             <span className="mt-1 text-2xl font-bold text-foreground">{followedReports.length}</span>
-            <span className="text-xs text-muted-foreground">Following</span>
+            <span className="text-xs text-muted-foreground">{t("profile.following")}</span>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="flex flex-col items-center p-4">
             <Trophy className="h-5 w-5 text-secondary" />
             <span className="mt-1 text-2xl font-bold text-foreground">{user.badges.length}</span>
-            <span className="text-xs text-muted-foreground">Badges</span>
+            <span className="text-xs text-muted-foreground">{t("profile.badges")}</span>
           </CardContent>
         </Card>
       </div>
@@ -148,15 +159,15 @@ export default function ProfilePage() {
       <Tabs defaultValue="my-reports">
         <TabsList className="w-full">
           <TabsTrigger value="my-reports" className="flex-1">
-            My Reports ({myReports.length})
+            {t("profile.myReports", { count: myReports.length })}
           </TabsTrigger>
           <TabsTrigger value="following" className="flex-1">
-            Following ({followedReports.length})
+            {t("profile.followedReports", { count: followedReports.length })}
           </TabsTrigger>
         </TabsList>
         <TabsContent value="my-reports" className="mt-4">
           {myReports.length === 0 ? (
-            <p className="py-8 text-center text-sm text-muted-foreground">No reports yet</p>
+            <p className="py-8 text-center text-sm text-muted-foreground">{t("profile.noReports")}</p>
           ) : (
             <div className="flex flex-col gap-3">
               {myReports.map((r) => (
@@ -167,7 +178,7 @@ export default function ProfilePage() {
         </TabsContent>
         <TabsContent value="following" className="mt-4">
           {followedReports.length === 0 ? (
-            <p className="py-8 text-center text-sm text-muted-foreground">Not following any reports</p>
+            <p className="py-8 text-center text-sm text-muted-foreground">{t("profile.noFollowing")}</p>
           ) : (
             <div className="flex flex-col gap-3">
               {followedReports.map((r) => (

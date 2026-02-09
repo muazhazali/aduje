@@ -7,24 +7,26 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button"
 import { BoringAvatar } from "@/components/boring-avatar"
 import { toast } from "sonner"
+import { useTranslations } from "next-intl"
 
 export default function LoginPage() {
   const router = useRouter()
   const { setUser, setNotifications } = useStore()
+  const t = useTranslations()
 
   const handleGoogleLogin = () => {
     // In production, this would use PocketBase OAuth
     // For demo, we'll simulate login
     setUser(MOCK_USERS[0])
     setNotifications(MOCK_NOTIFICATIONS)
-    toast.success("Signed in as Ahmad bin Ibrahim")
+    toast.success(t("auth.signedInAs", { name: "Ahmad bin Ibrahim" }))
     router.push("/")
   }
 
   const handleDemoLogin = (userIndex: number) => {
     setUser(MOCK_USERS[userIndex])
     setNotifications(MOCK_NOTIFICATIONS)
-    toast.success(`Signed in as ${MOCK_USERS[userIndex].name}`)
+    toast.success(t("auth.signedInAs", { name: MOCK_USERS[userIndex].name }))
     router.push("/")
   }
 
@@ -35,8 +37,8 @@ export default function LoginPage() {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary">
             <span className="text-2xl font-bold text-primary-foreground">R</span>
           </div>
-          <CardTitle className="text-xl">Welcome to ReporterMY</CardTitle>
-          <CardDescription>Sign in to report issues in your community</CardDescription>
+          <CardTitle className="text-xl">{t("auth.welcomeTitle")}</CardTitle>
+          <CardDescription>{t("auth.welcomeSubtitle")}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <Button onClick={handleGoogleLogin} className="w-full gap-2" size="lg">
@@ -58,7 +60,7 @@ export default function LoginPage() {
                 fill="#EA4335"
               />
             </svg>
-            Sign in with Google
+            {t("auth.signInWithGoogle")}
           </Button>
 
           <div className="relative">
@@ -66,7 +68,7 @@ export default function LoginPage() {
               <span className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">Demo accounts</span>
+              <span className="bg-card px-2 text-muted-foreground">{t("auth.demoAccounts")}</span>
             </div>
           </div>
 
@@ -82,7 +84,7 @@ export default function LoginPage() {
                 <div className="text-left">
                   <p className="text-sm font-medium">{u.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {u.isAdmin ? "Admin" : "User"} - {u.points} pts
+                    {u.isAdmin ? t("auth.admin") : t("auth.user")} - {u.points} {t("common.pointsShort")}
                   </p>
                 </div>
               </Button>

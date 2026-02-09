@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { CATEGORY_LABELS, type ReportCategory } from "@/lib/types"
+import { type ReportCategory } from "@/lib/types"
 import {
   Construction,
   Lightbulb,
@@ -15,6 +15,7 @@ import {
   CircleHelp,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 const CATEGORY_ICON_MAP: Record<ReportCategory, LucideIcon> = {
   jalan_raya: Construction,
@@ -56,8 +57,9 @@ export function CategoryBadge({
   showIcon?: boolean
   className?: string
 }) {
+  const t = useTranslations()
   const Icon = CATEGORY_ICON_MAP[category] || CircleHelp
-  const label = CATEGORY_LABELS[category]
+  const label = t(`categories.${category}`)
   const shortLabel = label.split(" (")[0]
 
   return (

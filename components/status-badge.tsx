@@ -2,9 +2,12 @@
 
 import { cn } from "@/lib/utils"
 import { getStatusColor } from "@/lib/helpers"
-import { STATUS_LABELS, type ReportStatus } from "@/lib/types"
+import { type ReportStatus } from "@/lib/types"
+import { useTranslations } from "next-intl"
 
 export function StatusBadge({ status, className }: { status: ReportStatus; className?: string }) {
+  const t = useTranslations()
+
   return (
     <span
       className={cn(
@@ -13,7 +16,7 @@ export function StatusBadge({ status, className }: { status: ReportStatus; class
         className,
       )}
     >
-      {STATUS_LABELS[status]}
+      {t(`status.${status}`)}
     </span>
   )
 }
