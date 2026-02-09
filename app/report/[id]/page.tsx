@@ -32,6 +32,7 @@ import { useTranslations } from "next-intl"
 import { fetchCommentsByReport, fetchReportById, mapComment } from "@/lib/pocketbase-data"
 import type { Comment, Report } from "@/lib/types"
 import pb from "@/lib/pocketbase"
+import { sanitizeUserInput } from "@/lib/sanitize"
 
 export default function ReportDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
@@ -158,11 +159,19 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
     }
     if (!commentText.trim()) return
     
+    // Validate comment length
+    if (commentText.trim().length > 500) {
+      toast.error("Komen terlalu panjang (maksimum 500 aksara)")
+      return
+    }
+    
     try {
+      const sanitizedContent = sanitizeUserInput(commentText.trim())
+      
       const created = await pb.collection("comments").create({
         reportId: report.id,
         userId: user.id,
-        content: commentText.trim(),
+        content: sanitizedContent,
         photos: [],
         parentId: null,
         reactions: { like: [], support: [], urgent: [] },
@@ -222,7 +231,9 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
       {/* Description */}
       <Card className="mb-4">
         <CardContent className="p-4">
-          <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">{report.description}</p>
+          <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+            {sanitizeUserInput(report.description)}
+          </p>
         </CardContent>
       </Card>
 
@@ -340,7 +351,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
                       <span className="text-sm font-medium text-foreground">{commentUser?.name}</span>
                       <span className="text-xs text-muted-foreground">{formatRelativeTime(comment.created)}</span>
                     </div>
-                    <p className="mt-0.5 text-sm text-foreground">{comment.content}</p>
+                    <p className="mt-0.5 text-sm text-foreground">{sanitizeUserInput(comment.content)}</p>
                     <div className="mt-1.5 flex items-center gap-3">
                       <button type="button" className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
                         <ThumbsUp className="h-3 w-3" />
@@ -367,7 +378,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
                               <span className="text-xs font-medium text-foreground">{replyUser?.name}</span>
                               <span className="text-xs text-muted-foreground">{formatRelativeTime(reply.created)}</span>
                             </div>
-                            <p className="mt-0.5 text-xs text-foreground">{reply.content}</p>
+                            <p className="mt-0.5 text-xs text-foreground">{sanitizeUserInput(reply.content)}</p>
                           </div>
                         </div>
                       )

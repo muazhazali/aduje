@@ -2,6 +2,20 @@
 
 Progressive Web App (PWA) untuk komuniti Malaysia melapor isu setempat seperti lubang jalan, lampu jalan rosak, dan sampah sarap. Aplikasi ini direka bentuk untuk mudah digunakan di telefon, menggunakan reka bentuk MYDS, serta menyokong peta dan penjejakan status.
 
+## 🔒 Security Features
+
+This application implements comprehensive security measures:
+
+- ✅ **Security Headers**: CSP, X-Frame-Options, HSTS, and more
+- ✅ **XSS Protection**: Input sanitization for all user-generated content
+- ✅ **Input Validation**: Strict validation for all user inputs
+- ✅ **File Upload Security**: Type and size validation for images
+- ✅ **Rate Limiting**: Protection against brute force and DoS attacks
+- ✅ **CSRF Protection**: Token-based protection for form submissions
+- ✅ **Environment Security**: No credentials in code, proper .gitignore
+
+📖 **See**: `SECURITY.md` for detailed security documentation
+
 ## Ciri Utama
 - Log masuk Google (PocketBase OAuth) dan profil pengguna
 - Laporan isu dengan foto, lokasi, kategori, dan status
@@ -55,11 +69,34 @@ Progressive Web App (PWA) untuk komuniti Malaysia melapor isu setempat seperti l
 - Pastikan koleksi mengikut skema PRD (skrip disediakan).
 
 ## Deployment
-- **Frontend (Vercel):**
-  - Tambah `NEXT_PUBLIC_POCKETBASE_URL` dan `NEXT_PUBLIC_APP_URL`.
-- **Backend (PocketBase):**
-  - Deploy ke Railway/Fly.io/PocketHost.
-  - Konfigurasi OAuth Google dan CORS.
+
+### Quick Deployment to Vercel
+
+1. **Prepare Environment Variables**:
+   - Copy `.env.example` to `.env.local`
+   - Fill in your PocketBase URL and credentials
+   - **Never commit `.env.local` to git!**
+
+2. **Deploy to Vercel**:
+   ```bash
+   # Push to GitHub
+   git push origin main
+   
+   # Deploy via Vercel Dashboard or CLI
+   vercel deploy --prod
+   ```
+
+3. **Configure Environment Variables in Vercel**:
+   - Go to Project Settings → Environment Variables
+   - Add all variables from `.env.example`
+   - See `DEPLOYMENT.md` for detailed instructions
+
+4. **Verify Security**:
+   - Test at https://securityheaders.com
+   - Check all features work correctly
+   - Review `SECURITY-FIXES-SUMMARY.md`
+
+📖 **See**: `DEPLOYMENT.md` for complete deployment guide with security checklist
 
 ## Analitik
 - Umami dashboard: https://umami.muaz.app/share/seTdPt2PEeX4C1kk
@@ -69,10 +106,18 @@ Progressive Web App (PWA) untuk komuniti Malaysia melapor isu setempat seperti l
 - Bahasa lalai: Bahasa Malaysia.
 - Data demo digunakan untuk UI; integrasi PocketBase siap untuk sambungan sebenar.
 
+## Documentation
+
+- 📖 `SECURITY.md` - Comprehensive security documentation
+- 📖 `DEPLOYMENT.md` - Step-by-step deployment guide
+- 📖 `SECURITY-FIXES-SUMMARY.md` - Summary of security improvements
+- 📖 `.env.example` - Environment variable template
+
 ## Had Semasa
 - Tiada ujian automasi penuh.
 - Logik notifikasi/push masih asas dan demo.
 - Penilaian prestasi Lighthouse belum dijalankan.
+- Rate limiting menggunakan in-memory storage (gunakan Redis untuk production berskala).
 
 ## Penambahbaikan Masa Depan
 - Pengesahan laporan lebih pintar (AI/image).

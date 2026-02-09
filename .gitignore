@@ -9,5 +9,12 @@ instrumentation-client.ts
 node_modules/
 .next/
 .env*.local
+.env
+.env.production
 .DS_Store
 .pnpm-store
+
+# Security - Never commit credentials
+*.pem
+*.key
+secrets.json

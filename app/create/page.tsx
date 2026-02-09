@@ -20,6 +20,7 @@ import { useTranslations } from "next-intl"
 import { fetchReportById, fetchReports } from "@/lib/pocketbase-data"
 import type { Report } from "@/lib/types"
 import pb from "@/lib/pocketbase"
+import { sanitizeUserInput, isValidImageType, isValidImageSize, sanitizeCoordinates, isValidCategory } from "@/lib/sanitize"
 
 export default function CreateReportPage() {
   const router = useRouter()
@@ -145,12 +146,24 @@ export default function CreateReportPage() {
       toast.error(t("create.maxPhotos"))
       return
     }
-    const newFiles = files.filter((f) => f.size <= 5 * 1024 * 1024)
-    if (newFiles.length < files.length) {
-      toast.error(t("create.photoTooLarge"))
-    }
-    setPhotoFiles((prev) => [...prev, ...newFiles])
-    for (const f of newFiles) {
+    
+    // Validate file types and sizes
+    const validFiles = files.filter((f) => {
+      if (!isValidImageType(f)) {
+        toast.error(`${f.name} bukan format imej yang sah`)
+        return false
+      }
+      if (!isValidImageSize(f)) {
+        toast.error(`${f.name} terlalu besar (maksimum 5MB)`)
+        return false
+      }
+      return true
+    })
+    
+    if (validFiles.length === 0) return
+    
+    setPhotoFiles((prev) => [...prev, ...validFiles])
+    for (const f of validFiles) {
       const reader = new FileReader()
       reader.onload = (ev) => {
         setPhotoPreviews((prev) => [...prev, ev.target?.result as string])
@@ -176,16 +189,39 @@ export default function CreateReportPage() {
       toast.error(t("auth.pleaseSignIn"))
       return
     }
+    
+    // Validate inputs
+    if (!title.trim() || title.length > 100) {
+      toast.error("Tajuk tidak sah")
+      return
+    }
+    
+    if (!description.trim() || description.length > 1000) {
+      toast.error("Penerangan tidak sah")
+      return
+    }
+    
+    if (!isValidCategory(category)) {
+      toast.error("Kategori tidak sah")
+      return
+    }
+    
+    const coords = sanitizeCoordinates(latitude, longitude)
+    if (!coords) {
+      toast.error("Koordinat tidak sah")
+      return
+    }
+    
     setSubmitting(true)
     try {
       const payload = {
-        title,
-        description,
+        title: sanitizeUserInput(title.trim()),
+        description: sanitizeUserInput(description.trim()),
         category: category as ReportCategory,
-        latitude,
-        longitude,
-        address,
-        landmark,
+        latitude: coords.lat,
+        longitude: coords.lng,
+        address: sanitizeUserInput(address.trim()),
+        landmark: sanitizeUserInput(landmark.trim()),
         status: "open",
         createdBy: user.id,
         followers: [user.id],
